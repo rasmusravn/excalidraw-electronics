@@ -72,6 +72,7 @@ import {
   termination,
 } from "./symbols/routing.ts";
 import { diplexer, hybrid180, hybrid90, iqDemodulator, iqModulator } from "./symbols/iq.ts";
+import { arrayAntenna, hornAntenna, waveguideSection, waveguideTermination, waveguideTransition } from "./symbols/waveguide.ts";
 
 export const definitions: SymbolDefinition[] = [
   resistor,
@@ -151,6 +152,8 @@ export const definitions: SymbolDefinition[] = [
   hybrid180,
   diplexer,
   antenna,
+  arrayAntenna,
+  hornAntenna,
   rfSwitchSpdt,
   rfSwitchSp4t,
   adc,
@@ -163,5 +166,8 @@ export const definitions: SymbolDefinition[] = [
   termination,
   dcBlock,
   biasTee,
+  waveguideSection,
+  waveguideTransition,
+  waveguideTermination,
   rfPort,
 ];

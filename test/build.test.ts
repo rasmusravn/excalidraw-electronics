@@ -263,3 +263,16 @@ test("the Later I/Q and hybrid blocks sit in their families, tagged Later", () =
     assert.equal(definitions.find((d) => d.name === name)?.tier, "Later", name);
   }
 });
+
+test("the Later antennas and waveguide parts sit in their families, tagged Later", () => {
+  const names = build(definitions).rfBlocks.libraryItems.map((item) => item.name);
+  const after = (anchor: string, family: string[]) => {
+    const start = names.indexOf(anchor) + 1;
+    assert.deepEqual(names.slice(start, start + family.length), family);
+  };
+  after("Antenna", ["Array antenna", "Horn antenna"]);
+  after("Bias tee", ["Waveguide section", "Waveguide-to-coax transition", "Waveguide termination"]);
+  for (const name of ["Array antenna", "Horn antenna", "Waveguide section", "Waveguide-to-coax transition", "Waveguide termination"]) {
+    assert.equal(definitions.find((d) => d.name === name)?.tier, "Later", name);
+  }
+});
