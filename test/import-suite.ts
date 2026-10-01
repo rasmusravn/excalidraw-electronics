@@ -82,4 +82,18 @@ export function importSuite(which: "fork" | "upstream") {
     assert.equal(restored.find((e) => e.id === "wire")!.endBinding?.elementId, target.id);
     assert.deepEqual(restored.find((e) => e.id === target.id)!.boundElements, [{ type: "arrow", id: "wire" }]);
   });
+
+  test(`${which}: a drawing started from the template has the grid on and draws Wires`, async () => {
+    const L = await loadExcalidraw(which);
+    const drawing = JSON.parse(build(definitions).template.match(/```json\n([\s\S]*?)\n```/)![1]);
+    const appState = L.restoreAppState(drawing.appState, null);
+    assert.equal(appState.gridModeEnabled, true);
+    assert.equal(appState.gridSize, GRID);
+    assert.equal(appState.currentItemArrowType, "elbow");
+    assert.equal(appState.currentItemStartArrowhead, null);
+    assert.equal(appState.currentItemEndArrowhead, null);
+    assert.equal(appState.currentItemRoughness, 0);
+    assert.equal(appState.currentItemFontFamily, 3);
+    assert.deepEqual(drawing.elements, []);
+  });
 }

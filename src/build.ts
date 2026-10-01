@@ -1,7 +1,7 @@
-// Turns Symbol definitions into the two Libraries and the catalog drawing, and refuses to
-// produce anything that would break in Excalidraw.
+// Turns Symbol definitions into the two Libraries, the catalog and the drawing template, and
+// refuses to produce anything that would break in Excalidraw.
 import { createHash } from "node:crypto";
-import { GRID, bounds, floorToGrid, gridAnchor, pinShapes, text } from "./primitives.ts";
+import { FONT, GRID, INK, STROKE, bounds, floorToGrid, gridAnchor, pinShapes, text } from "./primitives.ts";
 import type { Pin, Shape } from "./primitives.ts";
 
 export type SymbolDefinition = {
@@ -41,7 +41,7 @@ export type Drawing = {
   files: Record<string, never>;
 };
 
-const SOURCE = "https://github.com/rasmusravn/excalidraw-electronics";
+export const SOURCE = "https://github.com/rasmusravn/excalidraw-electronics";
 const CREATED = Date.UTC(2026, 9, 1);
 
 const digest = (key: string) => createHash("sha1").update(key).digest();
@@ -138,6 +138,53 @@ const buildCatalog = (items: LibraryItem[]): Drawing => {
   };
 };
 
+// The drawing new Obsidian Excalidraw drawings start from: no elements, only settings. The grid
+// is on, and the arrow tool draws Wires: elbow arrows without arrowheads.
+const buildTemplate = () => {
+  const drawing = {
+    type: "excalidraw",
+    version: 2,
+    source: SOURCE,
+    elements: [],
+    appState: {
+      gridSize: GRID,
+      gridStep: 5,
+      gridModeEnabled: true,
+      viewBackgroundColor: "#ffffff",
+      currentItemArrowType: "elbow",
+      currentItemStartArrowhead: null,
+      currentItemEndArrowhead: null,
+      currentItemStrokeColor: INK,
+      currentItemStrokeWidth: STROKE,
+      currentItemRoughness: 0,
+      currentItemFontFamily: FONT.family,
+      currentItemFontSize: FONT.size,
+    },
+    files: {},
+  };
+  return [
+    "---",
+    "",
+    "excalidraw-plugin: parsed",
+    "tags: [excalidraw]",
+    "",
+    "---",
+    "==⚠  Switch to EXCALIDRAW VIEW in the MORE OPTIONS menu of this document. ⚠==",
+    "",
+    "",
+    "# Excalidraw Data",
+    "",
+    "## Text Elements",
+    "%%",
+    "## Drawing",
+    "```json",
+    JSON.stringify(drawing, null, 2),
+    "```",
+    "%%",
+    "",
+  ].join("\n");
+};
+
 export function build(definitions: SymbolDefinition[]) {
   const items = definitions.map((def) => ({ def, item: buildItem(def) }));
   const ofKind = (kind: SymbolDefinition["kind"]) => items.filter(({ def }) => def.kind === kind).map(({ item }) => item);
@@ -147,5 +194,6 @@ export function build(definitions: SymbolDefinition[]) {
     schematic: library(schematic),
     rfBlocks: library(rfBlocks),
     catalog: buildCatalog([...schematic, ...rfBlocks]),
+    template: buildTemplate(),
   };
 }

@@ -10,6 +10,7 @@ export type Excalidraw = {
   loadLibraryFromBlob(blob: Blob, status: string): Promise<{ id: string; name?: string; elements: El[] }[]>;
   restoreElements(elements: El[], local: null, opts?: Record<string, boolean>): El[];
   getCommonBounds(elements: El[]): [number, number, number, number];
+  restoreAppState(appState: El, local: null): El;
 };
 
 export async function loadExcalidraw(which: "fork" | "upstream"): Promise<Excalidraw> {
