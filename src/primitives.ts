@@ -157,22 +157,7 @@ export const schematicLabels = (x: number, bodyTop: number, designator: string, 
 // Records a Pin end. `dir` points from the Pin end inward along its lead.
 export const pin = (x: number, y: number, dir: Point): Pin => ({ x, y, dir });
 
-// A Junction: where Wires meet. Wires come from any side, so it has no lead direction.
-export const junction = (x: number, y: number): Pin => ({ x, y, dir: [0, 0] });
-
-// An elbow Wire stops BASE_BINDING_GAP (5) + strokeWidth/2 outside its target. With a 1px target,
-// that is 5.75 from the centre on every side: the outer edge of a filled dot of radius 5.
-const junctionShapes = (x: number, y: number): Shape[] => {
-  const outline: Point[] = [];
-  for (let i = 0; i < 12; i++) outline.push([x + 5 * Math.cos((i * Math.PI) / 6), y + 5 * Math.sin((i * Math.PI) / 6)]);
-  return [
-    ellipse(x, y, 0.5, { opacity: 0, strokeWidth: 0.5, customData: { pinEnd: [0, 0] } }),
-    polygon(outline, { backgroundColor: INK }),
-  ];
-};
-
 export const pinShapes = ({ x, y, dir }: Pin): Shape[] => {
-  if (dir[0] === 0 && dir[1] === 0) return junctionShapes(x, y);
   // Pin target: invisible and bindable. Elbow arrows snap to the target's nearest side midpoint,
   // then sit BASE_BINDING_GAP (5) + strokeWidth/2 outside it, so inset the target by that much
   // plus its radius and the Wire end lands on the Pin end.

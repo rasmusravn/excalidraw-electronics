@@ -141,6 +141,7 @@ const HOW_TO_WIRE = `How to wire
   Drawings started from the template already are.
 - Drag each Wire end to a Pin along its lead. It ends on the Pin dot,
   stays attached and stays at right angles when the Symbol moves.
+- Join Wires at a Junction: attach each Wire to one of its legs, like a Pin.
 - Turn Symbols with Ctrl/Cmd+R (Rotate 90 degrees), not the rotate handle.
 - Elbow Wires always have rounded bends. Alt+W (Square Wires) makes them sharp right angles;
   run it again to turn them back into elbow Wires, which re-route after moves.
