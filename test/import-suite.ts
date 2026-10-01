@@ -1,0 +1,85 @@
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { build } from "../src/build.ts";
+import { definitions } from "../src/definitions.ts";
+import { GRID } from "../src/primitives.ts";
+import type { Library } from "../src/build.ts";
+import { libraryBlob, loadExcalidraw } from "./excalidraw.ts";
+
+export function importSuite(which: "fork" | "upstream") {
+  const blob = (lib: Library) => libraryBlob(lib);
+
+  const libraries = () => {
+    const { schematic, rfBlocks } = build(definitions);
+    return [schematic, rfBlocks].filter((lib) => lib.libraryItems.length > 0);
+  };
+
+  // Pin targets record where their Pin end is, relative to their own centre.
+  const pinEnds = (elements: Record<string, any>[]) =>
+    elements
+      .filter((e) => e.customData?.pinEnd)
+      .map((e) => [e.x + e.width / 2 + e.customData.pinEnd[0], e.y + e.height / 2 + e.customData.pinEnd[1]]);
+
+  test(`${which}: import keeps every element of every item`, async () => {
+    const L = await loadExcalidraw(which);
+    for (const lib of libraries()) {
+      const items = await L.loadLibraryFromBlob(blob(lib), "unpublished");
+      assert.equal(items.length, lib.libraryItems.length);
+      for (const [i, item] of items.entries()) {
+        const expected = lib.libraryItems[i];
+        assert.equal(item.name, expected.name);
+        assert.deepEqual(item.elements.map((e) => e.id), expected.elements.map((e) => e.id), expected.name);
+        const placed = L.restoreElements(item.elements, null, { deleteInvisibleElements: true });
+        assert.equal(placed.filter((e) => !e.isDeleted).length, expected.elements.length, `${expected.name} after placement`);
+      }
+    }
+  });
+
+  test(`${which}: after placement every Pin is on the grid relative to the item's top-left`, async () => {
+    const L = await loadExcalidraw(which);
+    for (const lib of libraries()) {
+      for (const item of await L.loadLibraryFromBlob(blob(lib), "unpublished")) {
+        const placed = L.restoreElements(item.elements, null, { deleteInvisibleElements: true });
+        const [minX, minY] = L.getCommonBounds(placed);
+        const pins = pinEnds(placed);
+        assert.ok(pins.length > 0, `${item.name} has Pins`);
+        for (const [x, y] of pins) {
+          assert.ok((x - minX) % GRID === 0 && (y - minY) % GRID === 0,
+            `${item.name}: Pin (${x}, ${y}) is not on the grid from top-left (${minX}, ${minY})`);
+        }
+      }
+    }
+  });
+
+  test(`${which}: each item is one group and its Pin targets stay invisible bindable ellipses`, async () => {
+    const L = await loadExcalidraw(which);
+    for (const lib of libraries()) {
+      for (const item of await L.loadLibraryFromBlob(blob(lib), "unpublished")) {
+        const groups = new Set(item.elements.map((e) => JSON.stringify(e.groupIds)));
+        assert.equal(groups.size, 1, `${item.name} groups`);
+        assert.equal(item.elements[0].groupIds.length, 1, `${item.name} group depth`);
+        const targets = item.elements.filter((e) => e.customData?.pinEnd);
+        for (const t of targets) {
+          assert.equal(t.type, "ellipse");
+          assert.equal(t.opacity, 0);
+        }
+      }
+    }
+  });
+
+  test(`${which}: an arrow bound to a Pin target survives restore`, async () => {
+    const L = await loadExcalidraw(which);
+    const [item] = await L.loadLibraryFromBlob(blob(libraries()[0]), "unpublished");
+    const elements = L.restoreElements(item.elements, null);
+    const target = elements.find((e) => e.customData?.pinEnd)!;
+    target.boundElements = [{ type: "arrow", id: "wire" }];
+    const wire = {
+      id: "wire", type: "arrow", x: target.x - 40, y: target.y + target.height / 2, width: 40, height: 0,
+      points: [[0, 0], [40, 0]], startArrowhead: null, endArrowhead: null, startBinding: null,
+      endBinding: { elementId: target.id, fixedPoint: [0.5, 0.5], mode: "inside" },
+    };
+    const restored = L.restoreElements([...elements, wire], null, { repairBindings: true });
+    assert.equal(restored.find((e) => e.id === "wire")!.endBinding?.elementId, target.id);
+    assert.deepEqual(restored.find((e) => e.id === target.id)!.boundElements, [{ type: "arrow", id: "wire" }]);
+  });
+}
