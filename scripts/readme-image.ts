@@ -1,5 +1,5 @@
 // Draws the README's example: a superheterodyne receiver chain, placed from the Library's own
-// Symbols and wired with square Wires. Writes docs/images/receiver.excalidraw (open it in
+// Symbols and wired with elbow Wires bound to their Pins, on the project's Template settings. Writes docs/images/receiver.excalidraw (open it in
 // Excalidraw to edit), receiver.svg and, if Chromium is installed, receiver.png.
 // Usage: node scripts/readme-image.ts
 import { execFileSync } from "node:child_process";
@@ -14,39 +14,49 @@ const out = "docs/images";
 const { rfBlocks } = build(definitions, { version: "0" });
 const item = (name: string) => rfBlocks.libraryItems.find((i) => i.name === name)!;
 
-// Where a Pin target's Pin end is, relative to its item's grid anchor.
-const pinEnd = (e: Element & { customData?: { pinEnd: number[] } }) => [e.x + e.width / 2 + e.customData!.pinEnd[0], e.y + e.height / 2 + e.customData!.pinEnd[1]];
-const pinsOf = (name: string) =>
-  item(name).elements.filter((e: any) => e.customData?.pinEnd).map((e: any) => pinEnd(e)).sort((a, b) => a[0] - b[0] || a[1] - b[1]);
-
 type Placed = { name: string; x: number; y: number; id: string };
 const elements: any[] = [];
 const place = (name: string, x: number, y: number, id: string): Placed => {
-  const p = { name, x, y, id };
   for (const e of item(name).elements) elements.push({ ...structuredClone(e), id: `${id}-${e.id}`, x: e.x + x, y: e.y + y, groupIds: e.groupIds.map((g) => `${id}-${g}`) });
-  return p;
+  return { name, x, y, id };
 };
-const pin = ({ name, x, y }: Placed, which: "left" | "right" | "top" | "bottom") => {
-  const pins = pinsOf(name);
-  const pick = { left: (a: number[], b: number[]) => a[0] - b[0], right: (a: number[], b: number[]) => b[0] - a[0], top: (a: number[], b: number[]) => a[1] - b[1], bottom: (a: number[], b: number[]) => b[1] - a[1] }[which];
-  const [px, py] = [...pins].sort(pick)[0];
-  return [x + px, y + py];
+
+// The Pin target on one side of a placed Symbol, and where its Pin end is.
+const SIDE = { left: [-1, 0], right: [1, 0], top: [0, -1], bottom: [0, 1] } as const;
+const targetOf = ({ id }: Placed, side: keyof typeof SIDE) => {
+  const [sx, sy] = SIDE[side];
+  const t = elements.find((e) => e.id.startsWith(`${id}-`) && e.customData?.pinEnd && Math.sign(e.customData.pinEnd[0]) === sx && Math.sign(e.customData.pinEnd[1]) === sy);
+  if (!t) throw new Error(`${id} has no ${side} Pin`);
+  return t;
 };
+const pinEnd = (t: any) => [t.x + t.width / 2 + t.customData.pinEnd[0], t.y + t.height / 2 + t.customData.pinEnd[1]];
+
+// A Wire as the template draws them: an elbow arrow without arrowheads, bound to a Pin target at each
+// end the way Excalidraw binds one, the binding gap outside the target.
 let wires = 0;
-const wire = (...points: number[][]) => {
-  const [x, y] = points[0];
+const bind = (t: any, side: keyof typeof SIDE, arrowId: string) => {
+  const gap = 5 + t.strokeWidth / 2;
+  const [sx, sy] = SIDE[side];
+  t.boundElements = [...(t.boundElements ?? []), { type: "arrow", id: arrowId }];
+  return { elementId: t.id, mode: "orbit", fixedPoint: [sx === 0 ? 0.5 : sx < 0 ? -gap / t.width : 1 + gap / t.width, sy === 0 ? 0.5 : sy < 0 ? -gap / t.height : 1 + gap / t.height] };
+};
+const wire = (from: [Placed, keyof typeof SIDE], to: [Placed, keyof typeof SIDE]) => {
+  const [a, b] = [targetOf(...from), targetOf(...to)];
+  const id = `wire-${wires++}`;
+  const [x, y] = pinEnd(a);
+  const [ex, ey] = pinEnd(b);
   elements.push({
-    type: "arrow", id: `wire-${wires++}`, x, y, width: 1, height: 1, angle: 0, strokeColor: INK, backgroundColor: "transparent",
+    type: "arrow", id, x, y, width: Math.abs(ex - x), height: Math.abs(ey - y), angle: 0, strokeColor: INK, backgroundColor: "transparent",
     fillStyle: "solid", strokeWidth: STROKE, strokeStyle: "solid", roughness: 0, opacity: 100, groupIds: [], frameId: null,
-    index: null, roundness: null, seed: 1 + wires, version: 1, versionNonce: 1 + wires, isDeleted: false, boundElements: null,
-    updated: 1, link: null, locked: false, points: points.map(([px, py]) => [px - x, py - y]), lastCommittedPoint: null,
-    startBinding: null, endBinding: null, startArrowhead: null, endArrowhead: null, elbowed: false,
+    index: null, roundness: { type: 3 }, seed: 1 + wires, version: 1, versionNonce: 1 + wires, isDeleted: false, boundElements: null,
+    updated: 1, link: null, locked: false, points: [[0, 0], [ex - x, ey - y]], lastCommittedPoint: null,
+    startBinding: bind(a, from[1], id), endBinding: bind(b, to[1], id), startArrowhead: null, endArrowhead: null, elbowed: true,
   });
 };
 const caption = (s: string, x: number, y: number, id: string) => elements.push({ ...text(x, y, s), id, strokeColor: "#868e96", index: null });
 
 // The chain sits on y = 0. Pins are on the 20px grid, so every Wire runs on it.
-const ant = place("Antenna", 0, -80, "ant");
+const ant = place("Antenna", 0, -100, "ant");
 const rf = place("Band-pass filter", 100, -20, "rf");
 const lna = place("Amplifier", 240, -20, "lna");
 const mix = place("Mixer", 380, -40, "mix");
@@ -55,24 +65,27 @@ const ifb = place("Band-pass filter", 520, -20, "if");
 const vga = place("Variable-gain amplifier", 640, -20, "vga");
 const adc = place("ADC", 780, -20, "adc");
 
-const [ax, ay] = pin(ant, "bottom");
-wire([ax, ay], [ax, 0], pin(rf, "left"));
-wire(pin(rf, "right"), pin(lna, "left"));
-wire(pin(lna, "right"), pin(mix, "left"));
-wire(pin(lo, "top"), pin(mix, "bottom"));
-wire(pin(mix, "right"), pin(ifb, "left"));
-wire(pin(ifb, "right"), pin(vga, "left"));
-wire(pin(vga, "right"), pin(adc, "left"));
-const [adcX] = pin(adc, "right");
-wire(pin(adc, "right"), [adcX + 40, 0]);
+wire([ant, "bottom"], [rf, "left"]);
+wire([rf, "right"], [lna, "left"]);
+wire([lna, "right"], [mix, "left"]);
+wire([lo, "top"], [mix, "bottom"]);
+wire([mix, "right"], [ifb, "left"]);
+wire([ifb, "right"], [vga, "left"]);
+wire([vga, "right"], [adc, "left"]);
 
 caption("RF 1.1 GHz", 110, -50, "cap-rf");
 caption("IF 100 MHz", 530, -50, "cap-if");
-caption("Superheterodyne receiver, drawn from the Library", 0, -140, "title");
+caption("Superheterodyne receiver, drawn from the Library", 0, -160, "title");
 
 const L = await loadExcalidraw("fork");
-const scene = L.restoreElements(elements, null);
-const appState = { viewBackgroundColor: "#ffffff", exportBackground: true, gridModeEnabled: false };
+// New drawings start from the project's Template, so the picture uses its settings: the 20px grid,
+// elbow arrows without arrowheads, roughness 0, Cascadia 14, stroke 1.5.
+const template = JSON.parse(build(definitions, { version: "0" }).template.match(/```json\n([\s\S]*?)\n```/)![1]);
+const appState = { ...template.appState, viewBackgroundColor: "#ffffff", exportBackground: true };
+const scene: any[] = L.restoreElements(elements, null, { repairBindings: true });
+// Settle each Wire onto its bindings, as Excalidraw does when one is drawn.
+const byId = new Map<string, any>(scene.map((e) => [e.id, e]));
+for (const e of scene.filter((e) => e.type === "arrow")) L.mutateElement(e, byId, { points: e.points });
 mkdirSync(out, { recursive: true });
 writeFileSync(`${out}/receiver.excalidraw`, `${JSON.stringify({ type: "excalidraw", version: 2, source: "https://github.com/rasmusravn/excalidraw-electronics", elements: scene, appState, files: {} }, null, 2)}\n`);
 
