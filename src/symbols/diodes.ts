@@ -1,4 +1,4 @@
-import { arrowhead, INK, line, pin, polygon, schematicLabels, LEFT, RIGHT } from "../primitives.ts";
+import { arrowhead, INK, line, pin, polygon, rect, schematicLabels, LEFT, RIGHT } from "../primitives.ts";
 import type { Point, Shape } from "../primitives.ts";
 import type { SymbolDefinition } from "../build.ts";
 
@@ -41,3 +41,17 @@ export const varactor = diode("Varactor", [bar, line([55, -10], [55, 10])], -10,
 
 // Light arriving: two arrows pointing down onto the diode.
 export const photodiode = diode("Photodiode", [bar, ...lightArrows([46, -22], [38, -14])], -26, "D?", "BPW34");
+
+// --- Later ---
+
+// A slab of intrinsic region between the triangle and the cathode.
+export const pinDiode: SymbolDefinition = {
+  ...diode("PIN diode", [bar, rect(50, -10, 5, 20), line([55, -10], [55, 10])], -10, "D?", "BAP64", 55),
+  tier: "Later",
+};
+
+// The cathode bar with both ends bent back towards the anode.
+export const tunnelDiode: SymbolDefinition = {
+  ...diode("Tunnel diode", [line([46, -10], [50, -10], [50, 10], [46, 10])], -10, "D?", "1N3716"),
+  tier: "Later",
+};

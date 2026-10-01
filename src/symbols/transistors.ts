@@ -51,6 +51,62 @@ export const nJfet = transistor(
   "J310",
 );
 
+// --- Later transistors ---
+
+const later = (d: SymbolDefinition): SymbolDefinition => ({ ...d, tier: "Later" });
+const solidChannel = line([26, 24], [26, 56]);
+
+// Depletion mode: the channel drawn unbroken, conducting at zero gate voltage.
+export const nMosfetDepletion = later(
+  transistor(
+    "N-MOSFET (depletion)",
+    [...gate, solidChannel, ...drainAndSource, body, line([40, 40], [40, 52]), arrowhead([40, 40], [26, 40], 1, 6)],
+    "BF998",
+  ),
+);
+export const pMosfetDepletion = later(
+  transistor(
+    "P-MOSFET (depletion)",
+    [...gate, solidChannel, ...drainAndSource, body, line([40, 40], [40, 28]), arrowhead([26, 40], [40, 40], 1, 6)],
+    "P-dep",
+  ),
+);
+
+// The gate arrow points out of the channel for P. G (0,40), S (40,0), D (40,80).
+export const pJfet = later(
+  transistor(
+    "P-JFET",
+    [line([0, 40], [26, 40]), arrowhead([26, 40], [0, 40], 0.35, 6), line([26, 24], [26, 56]), ...drainAndSource],
+    "J175",
+  ),
+);
+
+// An insulated gate beside a bipolar body: G (0,40), C (40,0), E (40,80), the emitter arrow out.
+export const igbt = later(
+  transistor(
+    "IGBT",
+    [
+      line([0, 40], [18, 40]),
+      line([18, 26], [18, 54]),
+      line([24, 26], [24, 54]),
+      upper,
+      lower,
+      arrowhead([24, 46], [40, 60], 0.8),
+    ],
+    "IKW40",
+  ),
+);
+
+// A depletion-mode FET whose channel is doubled for the two-dimensional electron gas, with no body
+// terminal. G (0,40), D (40,0), S (40,80).
+export const ganHemt = later(
+  transistor(
+    "GaN HEMT",
+    [...gate, line([26, 24], [26, 56]), line([29, 24], [29, 56]), line([29, 28], [40, 28], [40, 0]), line([29, 52], [40, 52], [40, 80])],
+    "CGH40010",
+  ),
+);
+
 // Amplifiers are triangles, as every datasheet draws them. Inputs at (0,20) and (0,60), output at
 // (100,40); − on top, + below.
 const amplifierShapes = [

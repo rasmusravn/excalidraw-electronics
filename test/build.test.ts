@@ -171,8 +171,11 @@ test("Pins have no visible dot: nothing visible sits only at a Pin end", () => {
 test("the Core transistors and amplifiers follow the NPN in the spec's order", () => {
   const names = build(definitions).schematic.libraryItems.map((item) => item.name);
   const active = ["NPN transistor", "PNP transistor", "N-MOSFET", "P-MOSFET", "N-JFET", "Op-amp", "Comparator"];
+  // In this order, with only Later Symbols between them.
   const start = names.indexOf("NPN transistor");
-  assert.deepEqual(names.slice(start, start + active.length), active);
+  const span = names.slice(start, names.indexOf("Comparator") + 1);
+  const later = new Set(definitions.filter((d) => d.tier === "Later").map((d) => d.name));
+  assert.deepEqual(span.filter((n) => !later.has(n)), active);
 });
 
 test("the Core sources, grounds, rail and switches follow the amplifiers in the spec's order", () => {
@@ -222,4 +225,16 @@ test("the whole RF-blocks Library is in the spec's order", () => {
     "50Ω termination", "DC block", "Bias tee",
     "RF port",
   ]);
+});
+
+test("the Later diodes and transistors follow their Core families, tagged Later", () => {
+  const names = build(definitions).schematic.libraryItems.map((item) => item.name);
+  const after = (anchor: string, family: string[]) => {
+    const start = names.indexOf(anchor) + 1;
+    assert.deepEqual(names.slice(start, start + family.length), family);
+  };
+  after("Photodiode", ["PIN diode", "Tunnel diode"]);
+  after("N-JFET", ["N-MOSFET (depletion)", "P-MOSFET (depletion)", "P-JFET", "IGBT", "GaN HEMT"]);
+  const later = ["PIN diode", "Tunnel diode", "N-MOSFET (depletion)", "P-MOSFET (depletion)", "P-JFET", "IGBT", "GaN HEMT"];
+  for (const name of later) assert.equal(definitions.find((d) => d.name === name)?.tier, "Later", name);
 });

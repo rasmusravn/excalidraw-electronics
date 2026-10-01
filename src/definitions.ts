@@ -16,8 +16,21 @@ import {
   transformer,
   variableCapacitor,
 } from "./symbols/passives.ts";
-import { led, photodiode, plainDiode, schottky, varactor, zener } from "./symbols/diodes.ts";
-import { comparator, nJfet, nMosfet, npn, opAmp, pMosfet, pnp } from "./symbols/transistors.ts";
+import { led, photodiode, pinDiode, plainDiode, schottky, tunnelDiode, varactor, zener } from "./symbols/diodes.ts";
+import {
+  comparator,
+  ganHemt,
+  igbt,
+  nJfet,
+  nMosfet,
+  nMosfetDepletion,
+  npn,
+  opAmp,
+  pJfet,
+  pMosfet,
+  pMosfetDepletion,
+  pnp,
+} from "./symbols/transistors.ts";
 import { chassisGround, earthGround, signalGround, supplyRail } from "./symbols/grounds.ts";
 import { acSource, battery, currentSource, dcSource } from "./symbols/sources.ts";
 import { pushButton, spdt, spst } from "./symbols/switches.ts";
@@ -76,11 +89,18 @@ export const definitions: SymbolDefinition[] = [
   led,
   varactor,
   photodiode,
+  pinDiode,
+  tunnelDiode,
   npn,
   pnp,
   nMosfet,
   pMosfet,
   nJfet,
+  nMosfetDepletion,
+  pMosfetDepletion,
+  pJfet,
+  igbt,
+  ganHemt,
   opAmp,
   comparator,
   dcSource,
