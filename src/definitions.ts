@@ -16,6 +16,7 @@ import {
   transformer,
   variableCapacitor,
 } from "./symbols/passives.ts";
+import { led, photodiode, plainDiode, schottky, varactor, zener } from "./symbols/diodes.ts";
 import { npn } from "./symbols/transistors.ts";
 import { signalGround } from "./symbols/grounds.ts";
 import { icBox, pinStub } from "./symbols/ic.ts";
@@ -34,6 +35,12 @@ export const definitions: SymbolDefinition[] = [
   ferriteBead,
   transformer,
   crystal,
+  plainDiode,
+  zener,
+  schottky,
+  led,
+  varactor,
+  photodiode,
   npn,
   signalGround,
   fuse,

@@ -130,3 +130,10 @@ test("every ANSI Variant comes directly after its IEC Symbol", () => {
     if (name.endsWith(" (ANSI)")) assert.equal(names[i - 1], name.slice(0, -" (ANSI)".length), name);
   }
 });
+
+test("the Core diodes follow the passives in the spec's order", () => {
+  const names = build(definitions).schematic.libraryItems.map((item) => item.name);
+  const diodes = ["Diode", "Zener diode", "Schottky diode", "LED", "Varactor", "Photodiode"];
+  const start = names.indexOf("Crystal") + 1;
+  assert.deepEqual(names.slice(start, start + diodes.length), diodes);
+});
