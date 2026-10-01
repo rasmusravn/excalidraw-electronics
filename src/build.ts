@@ -56,11 +56,11 @@ const fractionalIndex = (i: number) =>
     : `b${DIGITS[Math.floor((i - DIGITS.length) / DIGITS.length)]}${DIGITS[(i - DIGITS.length) % DIGITS.length]}`;
 
 // Ids, seeds and nonces come from a key, so rebuilding replaces items in place.
-const toElements = (shapes: Shape[], key: string, groupIds: string[]): Element[] =>
+const toElements = (shapes: Shape[], key: string, groupIds: string[], roughness = 0): Element[] =>
   shapes.map((shape, i) => {
     const h = digest(`${key}:${i}`);
     return {
-      roughness: 0,
+      roughness,
       angle: 0,
       frameId: null,
       boundElements: null,
@@ -99,17 +99,24 @@ const check = (name: string, elements: Element[]) => {
 
 const itemName = (def: SymbolDefinition) => (def.variant === "ANSI" ? `${def.name} (ANSI)` : def.name);
 
-const buildItem = (def: SymbolDefinition): LibraryItem => {
+export type BuildOptions = {
+  // Hand-drawn copies with their own ids, so they sit beside the clean items instead of replacing them.
+  sketchy?: boolean;
+};
+
+const buildItem = (def: SymbolDefinition, { sketchy = false }: BuildOptions): LibraryItem => {
   const name = itemName(def);
   const shapes = [...def.shapes, ...def.pins.flatMap(pinShapes)];
+  // Sketchy lines wander a little past their points, so keep the anchors clear of them.
+  const margin = sketchy ? 3 : 0;
   const { minX, minY, maxX, maxY } = bounds(shapes);
-  const ax = floorToGrid(minX);
-  const ay = floorToGrid(minY);
+  const ax = floorToGrid(minX - margin);
+  const ay = floorToGrid(minY - margin);
   // Excalidraw rotates about the bounding-box centre. With width and height the same parity in
   // grid cells, that centre is a grid point or the middle of a grid cell, so quarter turns keep
   // the Pins and the box's top-left on the grid.
-  const bx = ceilToGrid(maxX);
-  let by = ceilToGrid(maxY);
+  const bx = ceilToGrid(maxX + margin);
+  let by = ceilToGrid(maxY + margin);
   if (((bx - ax) / GRID + (by - ay) / GRID) % 2 !== 0) by += GRID;
 
   for (const p of def.pins) {
@@ -121,8 +128,8 @@ const buildItem = (def: SymbolDefinition): LibraryItem => {
   // Move everything so the grid anchor sits at the origin.
   const anchors = [gridAnchor(ax, ay), gridAnchor(bx - 1, by)];
   const normalised = [...anchors, ...shapes].map((s) => ({ ...s, x: s.x - ax, y: s.y - ay }));
-  const key = `${def.name}:${def.variant}`;
-  const elements = toElements(normalised, key, [hashId(`${key}:group`)]);
+  const key = `${sketchy ? "sketchy:" : ""}${def.name}:${def.variant}`;
+  const elements = toElements(normalised, key, [hashId(`${key}:group`)], sketchy ? 1 : 0);
   check(name, elements);
   return { id: hashId(`${key}:item`), status: "published", created: CREATED, name, elements };
 };
@@ -225,8 +232,8 @@ export const SCRIPT_MARKER = "// excalidraw-electronics script";
 const buildRotateScript = () =>
   [SCRIPT_MARKER, rotateSelectionQuarterTurn.toString(), `await ${rotateSelectionQuarterTurn.name}(ea);`, ""].join("\n");
 
-export function build(definitions: SymbolDefinition[]) {
-  const items = definitions.map((def) => ({ def, item: buildItem(def) }));
+export function build(definitions: SymbolDefinition[], options: BuildOptions = {}) {
+  const items = definitions.map((def) => ({ def, item: buildItem(def, options) }));
   const ids = new Set<string>();
   for (const { item } of items) {
     for (const e of item.elements) {

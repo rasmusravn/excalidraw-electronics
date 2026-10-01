@@ -103,3 +103,19 @@ test("the generic IC box and the Pin stub are in the schematic Library", () => {
   assert.ok(names.includes("Generic IC"));
   assert.ok(names.includes("Pin stub"));
 });
+
+test("the sketchy build is hand-drawn and has its own ids, so it never replaces the clean items", () => {
+  const clean = build(definitions);
+  const sketchy = build(definitions, { sketchy: true });
+  const items = (b: typeof clean) => [...b.schematic.libraryItems, ...b.rfBlocks.libraryItems];
+  const ids = new Set(items(clean).flatMap((item) => [item.id, ...item.elements.map((e) => e.id)]));
+  for (const item of items(sketchy)) {
+    assert.ok(!ids.has(item.id), `${item.name} item id`);
+    for (const e of item.elements) {
+      assert.ok(!ids.has(e.id), `${item.name} element id`);
+      // Only the invisible grid anchors stay smooth.
+      if (e.opacity !== 0) assert.ok(e.roughness > 0, `${item.name} ${e.type} roughness`);
+    }
+  }
+  assert.deepEqual(items(sketchy).map((item) => item.name), items(clean).map((item) => item.name));
+});

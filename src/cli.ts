@@ -1,4 +1,5 @@
-// Usage: node src/cli.ts [--install]
+// Usage: node src/cli.ts [--sketchy] [--install]
+// --sketchy also writes hand-drawn copies of both Libraries.
 // Writes the Libraries, the catalog and the drawing template to out/. --install also copies them
 // into the Obsidian vault named by VAULT in .env:
 // - the Libraries into Excalidraw/Libraries/, where the Excalidraw plugin loads them
@@ -15,6 +16,7 @@ import { definitions } from "./definitions.ts";
 
 const out = "out";
 const { schematic, rfBlocks, catalog, template, rotateScript } = build(definitions);
+const sketchy = process.argv.includes("--sketchy") ? build(definitions, { sketchy: true }) : undefined;
 const ROTATE = "Rotate 90 degrees";
 // marker: a file the Generator manages, which it may replace only if it finds the marker in it.
 const files: Record<string, { content: string; installTo: string; marker?: string }> = {
@@ -23,6 +25,10 @@ const files: Record<string, { content: string; installTo: string; marker?: strin
   "catalog.excalidraw": { content: json(catalog), installTo: "Electronics/catalog.excalidraw" },
   "Template.excalidraw.md": { content: template, installTo: "Excalidraw/Template.excalidraw.md", marker: `${TEMPLATE_MARKER}:` },
   [`${ROTATE}.md`]: { content: rotateScript, installTo: `${scriptFolder()}/${ROTATE}.md`, marker: SCRIPT_MARKER },
+  ...(sketchy && {
+    "electronics-schematic-sketchy.excalidrawlib": { content: json(sketchy.schematic), installTo: "Excalidraw/Libraries/electronics-schematic-sketchy.excalidrawlib" },
+    "electronics-rf-blocks-sketchy.excalidrawlib": { content: json(sketchy.rfBlocks), installTo: "Excalidraw/Libraries/electronics-rf-blocks-sketchy.excalidrawlib" },
+  }),
 };
 
 function vaultPath() {

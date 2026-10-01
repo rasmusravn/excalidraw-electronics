@@ -8,6 +8,7 @@ Needs Node 26 (it runs the TypeScript directly).
 npm install
 npm run build          # writes out/*.excalidrawlib and out/catalog.excalidraw
 npm run install-vault  # also copies them into the vault named by VAULT in .env
+node src/cli.ts --sketchy --install  # adds hand-drawn copies of both Libraries
 npm test               # imports the Library through the Obsidian fork's and upstream Excalidraw's own code
 npm run typecheck
 ```
