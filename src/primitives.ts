@@ -117,6 +117,37 @@ export const text = (x: number, y: number, str: string, align: "left" | "center"
 
 const LINE_HEIGHT = FONT.size * FONT.lineHeight;
 
+// A filled arrowhead with its tip `at` a fraction of the way from `from` to `to`.
+export const arrowhead = (from: Point, to: Point, at = 1, size = 7): Shape => {
+  const [dx, dy] = [to[0] - from[0], to[1] - from[1]];
+  const d = Math.hypot(dx, dy);
+  const [ux, uy] = [dx / d, dy / d];
+  const tip: Point = [from[0] + dx * at, from[1] + dy * at];
+  return polygon(
+    [
+      tip,
+      [tip[0] - size * ux + (size / 2) * uy, tip[1] - size * uy - (size / 2) * ux],
+      [tip[0] - size * ux - (size / 2) * uy, tip[1] - size * uy + (size / 2) * ux],
+    ],
+    { backgroundColor: INK },
+  );
+};
+
+// `count` semicircular humps of radius r in a row from `start` along `along`, bulging towards `bulge`:
+// a coil winding.
+export const arcs = (start: Point, along: Point, bulge: Point, count: number, r = 5): Shape => {
+  const points: Point[] = [start];
+  for (let h = 0; h < count; h++) {
+    for (let i = 1; i <= 8; i++) {
+      const t = Math.PI * (1 - i / 8);
+      const a = 2 * r * h + r + r * Math.cos(t);
+      const b = r * Math.sin(t);
+      points.push([start[0] + along[0] * a + bulge[0] * b, start[1] + along[1] * a + bulge[1] * b]);
+    }
+  }
+  return line(...points);
+};
+
 // Designator and value stacked above the body, left-aligned with it.
 export const schematicLabels = (x: number, bodyTop: number, designator: string, value: string): Shape[] => [
   text(x, bodyTop - 2 * LINE_HEIGHT - 2, designator),

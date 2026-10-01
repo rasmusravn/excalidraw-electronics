@@ -128,3 +128,21 @@ test("the catalog carries the how-to-wire note, sized to its text", () => {
   }
   assert.ok(note.height >= String(note.text).split("\n").length * 14 * 1.2);
 });
+
+test("the Core passives and fuses are in the schematic Library in the spec's order", () => {
+  const names = build(definitions).schematic.libraryItems.map((item) => item.name);
+  const passives = [
+    "Resistor", "Resistor (ANSI)", "Potentiometer", "Potentiometer (ANSI)", "Capacitor", "Polarized capacitor",
+    "Variable capacitor", "Inductor", "Cored inductor", "Ferrite bead", "Transformer", "Crystal",
+  ];
+  assert.deepEqual(names.slice(0, passives.length), passives);
+  assert.equal(names.indexOf("Fuse (ANSI)"), names.indexOf("Fuse") + 1);
+  assert.ok(names.indexOf("Fuse") > names.indexOf("Signal ground"), "protection comes after the grounds");
+});
+
+test("every ANSI Variant comes directly after its IEC Symbol", () => {
+  const names = build(definitions).schematic.libraryItems.map((item) => item.name);
+  for (const [i, name] of names.entries()) {
+    if (name.endsWith(" (ANSI)")) assert.equal(names[i - 1], name.slice(0, -" (ANSI)".length), name);
+  }
+});

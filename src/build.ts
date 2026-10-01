@@ -173,7 +173,7 @@ const buildCatalog = (rows: LibraryItem[][]): Drawing => {
       }
       const caption = { ...text(x, captionY, item.name), strokeColor: "#868e96" };
       shapes.push({ shape: caption, key: `catalog:${item.id}:name`, groupIds: [] });
-      x += floorToGrid(bounds(item.elements).maxX) + 4 * GRID;
+      x += floorToGrid(Math.max(bounds(item.elements).maxX, caption.width)) + 4 * GRID;
     }
     top = captionY + 4 * GRID;
   }
