@@ -23,7 +23,8 @@ It downloads the latest release and puts the whole Kit in place:
 
 - both `.excalidrawlib` files in the plugin's library folder, which the plugin loads by itself
 - the two Commands, **Rotate 90 degrees** and **Square Wires**, in the script folder
-- the Template at `Excalidraw/Template.excalidraw.md`, so new drawings start with the 20px grid on and the arrow tool drawing Wires, only if you don't already have a Template there. If you do, it leaves yours alone and offers to save ours beside it.
+- the Template at `Excalidraw/Template.excalidraw.md`, so new drawings start with the 20px grid on and the arrow tool drawing Wires, only if you don't already have a Template there. If you do, it leaves yours alone and offers to save ours beside it
+- the hotkeys Ctrl/Cmd+R and Alt+W for the two Commands, where they are free (see Hotkeys)
 
 It never replaces a Template or script you made yourself.
 
