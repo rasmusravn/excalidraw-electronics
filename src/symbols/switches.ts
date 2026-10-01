@@ -1,4 +1,4 @@
-import { FONT, line, pin, text, LEFT, RIGHT } from "../primitives.ts";
+import { FONT, line, pin, rect, text, DOWN, LEFT, RIGHT, UP } from "../primitives.ts";
 import type { Shape } from "../primitives.ts";
 import type { SymbolDefinition } from "../build.ts";
 
@@ -30,3 +30,26 @@ export const pushButton = switchOf(
   [...leads, line([20, 0], [57, -14]), { ...line([46, -9.8], [46, -24]), strokeStyle: "dashed" }, line([40, -24], [52, -24])],
   -24,
 );
+
+// --- Later ---
+
+// A coil on the left (Pins (0,0) and (0,80)) driving a make contact on the right (Pins (60,0) and
+// (60,80)) through a dashed mechanical link. The labels go to the right.
+export const relay: SymbolDefinition = {
+  name: "Relay",
+  variant: "IEC",
+  tier: "Later",
+  kind: "Schematic",
+  shapes: [
+    line([0, 0], [0, 20]),
+    rect(-10, 20, 20, 40),
+    line([0, 60], [0, 80]),
+    line([60, 0], [60, 20]),
+    line([60, 60], [74, 23]),
+    line([60, 60], [60, 80]),
+    { ...line([10, 40], [67, 40]), strokeStyle: "dashed" },
+    text(84, 40 - FONT.size * FONT.lineHeight, "K?"),
+    text(84, 40, "12V"),
+  ],
+  pins: [pin(0, 0, DOWN), pin(0, 80, UP), pin(60, 0, DOWN), pin(60, 80, UP)],
+};

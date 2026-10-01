@@ -100,3 +100,11 @@ export const fuse = schematic("Fuse", [line([0, 0], [80, 0]), body, ...schematic
 // ANSI: one S-shaped period of a sine between the leads.
 const sCurve = line(...Array.from({ length: 17 }, (_, i): Point => [20 + (40 * i) / 16, -7 * Math.sin((2 * Math.PI * i) / 16)]));
 export const fuseAnsi = ansi(fuse, [...leads, sCurve, ...schematicLabels(20, -7, "F?", "1A")]);
+
+// --- Later ---
+
+// The resistor with a bent diagonal through it: a resistance that follows temperature.
+export const thermistor: SymbolDefinition = {
+  ...schematic("Thermistor", [...leads, body, line([14, 13], [22, 13], [62, -13]), ...schematicLabels(20, -13, "RT?", "NTC 10k")]),
+  tier: "Later",
+};

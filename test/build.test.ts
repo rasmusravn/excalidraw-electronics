@@ -42,6 +42,12 @@ test("the template is an Obsidian Excalidraw drawing the plugin can start from",
   assert.match(template, /## Drawing\n```json\n[\s\S]*\n```\n%%\n$/);
 });
 
+// The Core Symbols in `names`, in order, from `first` on: Later Symbols may sit between them.
+const coreFrom = (names: string[], first: string, count: number) => {
+  const later = new Set(definitions.filter((d) => d.tier === "Later").map((d) => d.name));
+  return names.slice(names.indexOf(first)).filter((n) => !later.has(n)).slice(0, count);
+};
+
 // A valid two-Pin Symbol to break one rule at a time.
 const wire = (name: string, extra: Partial<SymbolDefinition> = {}): SymbolDefinition => ({
   name,
@@ -134,9 +140,8 @@ test("every ANSI Variant comes directly after its IEC Symbol", () => {
 
 test("the Core diodes follow the passives in the spec's order", () => {
   const names = build(definitions).schematic.libraryItems.map((item) => item.name);
-  const diodes = ["Diode", "Zener diode", "Schottky diode", "LED", "Varactor", "Photodiode"];
-  const start = names.indexOf("Crystal") + 1;
-  assert.deepEqual(names.slice(start, start + diodes.length), diodes);
+  const diodes = ["Crystal", "Diode", "Zener diode", "Schottky diode", "LED", "Varactor", "Photodiode"];
+  assert.deepEqual(coreFrom(names, "Crystal", diodes.length), diodes);
 });
 
 test("the Junction has a Pin on each of four legs, and the T Junction on three", () => {
@@ -171,11 +176,7 @@ test("Pins have no visible dot: nothing visible sits only at a Pin end", () => {
 test("the Core transistors and amplifiers follow the NPN in the spec's order", () => {
   const names = build(definitions).schematic.libraryItems.map((item) => item.name);
   const active = ["NPN transistor", "PNP transistor", "N-MOSFET", "P-MOSFET", "N-JFET", "Op-amp", "Comparator"];
-  // In this order, with only Later Symbols between them.
-  const start = names.indexOf("NPN transistor");
-  const span = names.slice(start, names.indexOf("Comparator") + 1);
-  const later = new Set(definitions.filter((d) => d.tier === "Later").map((d) => d.name));
-  assert.deepEqual(span.filter((n) => !later.has(n)), active);
+  assert.deepEqual(coreFrom(names, "NPN transistor", active.length), active);
 });
 
 test("the Core sources, grounds, rail and switches follow the amplifiers in the spec's order", () => {
@@ -185,8 +186,7 @@ test("the Core sources, grounds, rail and switches follow the amplifiers in the 
     "Signal ground", "Chassis ground", "Earth ground", "Supply rail",
     "SPST switch", "SPDT switch", "Push button", "Fuse", "Fuse (ANSI)",
   ];
-  const start = names.indexOf("Comparator");
-  assert.deepEqual(names.slice(start, start + family.length), family);
+  assert.deepEqual(coreFrom(names, "Comparator", family.length), family);
 });
 
 test("the supply rail's label is editable text", () => {
@@ -237,4 +237,16 @@ test("the Later diodes and transistors follow their Core families, tagged Later"
   after("N-JFET", ["N-MOSFET (depletion)", "P-MOSFET (depletion)", "P-JFET", "IGBT", "GaN HEMT"]);
   const later = ["PIN diode", "Tunnel diode", "N-MOSFET (depletion)", "P-MOSFET (depletion)", "P-JFET", "IGBT", "GaN HEMT"];
   for (const name of later) assert.equal(definitions.find((d) => d.name === name)?.tier, "Later", name);
+});
+
+test("the Later electromechanical parts and transducers sit in their families, tagged Later", () => {
+  const names = build(definitions).schematic.libraryItems.map((item) => item.name);
+  const next = (anchor: string) => names[names.indexOf(anchor) + 1];
+  assert.equal(next("Crystal"), "Thermistor");
+  assert.equal(next("Push button"), "Relay");
+  const start = names.indexOf("Fuse (ANSI)") + 1;
+  assert.deepEqual(names.slice(start, start + 4), ["Speaker", "Microphone", "Lamp", "Motor"]);
+  for (const name of ["Thermistor", "Relay", "Speaker", "Microphone", "Lamp", "Motor"]) {
+    assert.equal(definitions.find((d) => d.name === name)?.tier, "Later", name);
+  }
 });

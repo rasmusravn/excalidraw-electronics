@@ -13,6 +13,7 @@ import {
   potentiometerAnsi,
   resistor,
   resistorAnsi,
+  thermistor,
   transformer,
   variableCapacitor,
 } from "./symbols/passives.ts";
@@ -33,7 +34,8 @@ import {
 } from "./symbols/transistors.ts";
 import { chassisGround, earthGround, signalGround, supplyRail } from "./symbols/grounds.ts";
 import { acSource, battery, currentSource, dcSource } from "./symbols/sources.ts";
-import { pushButton, spdt, spst } from "./symbols/switches.ts";
+import { pushButton, relay, spdt, spst } from "./symbols/switches.ts";
+import { lamp, microphone, motor, speaker } from "./symbols/transducers.ts";
 import { icBox, junctionDot, junctionT, pinStub } from "./symbols/ic.ts";
 import {
   amplifier,
@@ -83,6 +85,7 @@ export const definitions: SymbolDefinition[] = [
   ferriteBead,
   transformer,
   crystal,
+  thermistor,
   plainDiode,
   zener,
   schottky,
@@ -114,8 +117,13 @@ export const definitions: SymbolDefinition[] = [
   spst,
   spdt,
   pushButton,
+  relay,
   fuse,
   fuseAnsi,
+  speaker,
+  microphone,
+  lamp,
+  motor,
   icBox,
   pinStub,
   junctionDot,
