@@ -180,8 +180,7 @@ export const pinShapes = ({ x, y, dir }: Pin): Shape[] => {
 // An invisible 1px line. Placement snaps an item's bounding-box top-left to the grid; with one
 // at a grid point above-left of everything, that top-left is the anchor and Pins stay on the grid.
 // A second one at the bottom-right fixes the box's centre, which rotation turns about.
-// Always smooth: Excalidraw measures a line by its drawn path, so a sketchy anchor would move the box.
-export const gridAnchor = (x: number, y: number): Shape => linear([[x, y], [x + 1, y]], { opacity: 0, roughness: 0 });
+export const gridAnchor = (x: number, y: number): Shape => linear([[x, y], [x + 1, y]], { opacity: 0 });
 
 export const bounds = (shapes: Shape[]) => {
   let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;

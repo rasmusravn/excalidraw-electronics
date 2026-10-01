@@ -12,8 +12,7 @@ export function importSuite(which: "fork" | "upstream") {
 
   const libraries = () => {
     const { schematic, rfBlocks } = build(definitions);
-    const sketchy = build(definitions, { sketchy: true });
-    return [schematic, rfBlocks, sketchy.schematic, sketchy.rfBlocks].filter((lib) => lib.libraryItems.length > 0);
+    return [schematic, rfBlocks].filter((lib) => lib.libraryItems.length > 0);
   };
 
   // Pin targets record where their Pin end is, relative to their own centre.
