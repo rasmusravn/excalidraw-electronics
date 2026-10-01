@@ -72,6 +72,7 @@ import {
   termination,
 } from "./symbols/routing.ts";
 import { diplexer, hybrid180, hybrid90, iqDemodulator, iqModulator } from "./symbols/iq.ts";
+import { dsp, fft, fpga, nco, notchFilter, sawFilter, tunableBandPassFilter } from "./symbols/variants.ts";
 import { arrayAntenna, hornAntenna, waveguideSection, waveguideTermination, waveguideTransition } from "./symbols/waveguide.ts";
 
 export const definitions: SymbolDefinition[] = [
@@ -142,6 +143,9 @@ export const definitions: SymbolDefinition[] = [
   highPassFilter,
   bandPassFilter,
   bandStopFilter,
+  tunableBandPassFilter,
+  notchFilter,
+  sawFilter,
   attenuator,
   variableAttenuator,
   splitter,
@@ -163,6 +167,10 @@ export const definitions: SymbolDefinition[] = [
   divider,
   limiter,
   detector,
+  fpga,
+  dsp,
+  nco,
+  fft,
   termination,
   dcBlock,
   biasTee,

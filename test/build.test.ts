@@ -278,3 +278,16 @@ test("the Later antennas and waveguide parts sit in their families, tagged Later
     assert.equal(definitions.find((d) => d.name === name)?.tier, "Later", name);
   }
 });
+
+test("the Later filter variants and digital blocks sit in their families, tagged Later", () => {
+  const names = build(definitions).rfBlocks.libraryItems.map((item) => item.name);
+  const after = (anchor: string, family: string[]) => {
+    const start = names.indexOf(anchor) + 1;
+    assert.deepEqual(names.slice(start, start + family.length), family);
+  };
+  after("Band-stop filter", ["Tunable band-pass filter", "Notch filter", "SAW/BAW filter"]);
+  after("Detector", ["FPGA", "DSP", "NCO", "FFT"]);
+  for (const name of ["Tunable band-pass filter", "Notch filter", "SAW/BAW filter", "FPGA", "DSP", "NCO", "FFT"]) {
+    assert.equal(definitions.find((d) => d.name === name)?.tier, "Later", name);
+  }
+});

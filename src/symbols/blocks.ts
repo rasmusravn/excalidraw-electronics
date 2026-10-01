@@ -13,7 +13,7 @@ export const block = (name: string, shapes: SymbolDefinition["shapes"], pins: Sy
 });
 
 // A sine wave `width` wide, centred vertically on `y`.
-const sine = (x: number, y: number, width: number, amplitude: number) =>
+export const sine = (x: number, y: number, width: number, amplitude: number) =>
   line(...Array.from({ length: 17 }, (_, i): Point => [x + (width * i) / 16, y - amplitude * Math.sin((2 * Math.PI * i) / 16)]));
 
 // A 40×40 triangle between 20px leads; the label goes below it.
@@ -45,7 +45,7 @@ export const box = rect(20, -20, 40, 40);
 export const throughPins = [pin(0, 0, RIGHT), pin(80, 0, LEFT)];
 // A diagonal arrow through a body, crossing its outline at both ends: the IEC mark for "variable".
 const arrowThrough = (from: Point, to: Point) => [line(from, to), arrowhead(from, to, 1, 6)];
-const variable = arrowThrough([12, 18], [68, -24]);
+export const variable = arrowThrough([12, 18], [68, -24]);
 
 // A triangle; the label goes below it.
 const triangle = polygon([[20, -20], [60, 0], [20, 20]]);
