@@ -28,7 +28,9 @@ export const potentiometer = schematic(
   [...leads, body, ...wiper, ...schematicLabels(20, -7, "RV?", "10k")],
   [pin(0, 0, RIGHT), pin(80, 0, LEFT), pin(40, 40, UP)],
 );
-export const potentiometerAnsi = ansi(potentiometer, [...leads, zigzag, ...wiper, ...schematicLabels(20, -7, "RV?", "10k")]);
+// The zigzag crosses the wiper's line at y=0, so its arrow reaches further up.
+const ansiWiper = [line([40, 40], [40, 1]), arrowhead([40, 40], [40, 1])];
+export const potentiometerAnsi = ansi(potentiometer, [...leads, zigzag, ...ansiWiper, ...schematicLabels(20, -7, "RV?", "10k")]);
 
 // Two 28px plates 10px apart; the span is 60.
 const plates = [line([0, 0], [25, 0]), line([25, -14], [25, 14]), line([35, -14], [35, 14]), line([35, 0], [60, 0])];
