@@ -11,6 +11,8 @@ export type Excalidraw = {
   restoreElements(elements: El[], local: null, opts?: Record<string, boolean>): El[];
   getCommonBounds(elements: El[]): [number, number, number, number];
   restoreAppState(appState: El, local: null): El;
+  // The fork's signature; upstream 0.18.1 takes (element, updates).
+  mutateElement(element: El, elementsMap: Map<string, El>, updates: El): void;
 };
 
 export async function loadExcalidraw(which: "fork" | "upstream"): Promise<Excalidraw> {

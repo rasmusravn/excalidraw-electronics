@@ -15,3 +15,5 @@ npm run typecheck
 Copy `.env.example` to `.env` and set `VAULT`. The Library files go into the vault's `Excalidraw/Libraries/` folder, which the plugin loads when its library storage is set to the vault.
 
 `--install` also writes `Excalidraw/Template.excalidraw.md`, the plugin's default template path, unless a template you made yourself is already there. Every new drawing then starts with the 20px grid on, and the arrow tool draws Wires: elbow arrows with no arrowheads.
+
+`--install` also adds a "Rotate 90 degrees" script to the plugin's script folder and binds it to Ctrl/Cmd+R, unless that hotkey is taken. It turns the selected Symbols exactly a quarter turn clockwise, keeps their Pins on the grid and re-routes the Wires attached to them. Reload Obsidian after the first install so it picks up the hotkey.

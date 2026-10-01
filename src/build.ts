@@ -1,8 +1,9 @@
-// Turns Symbol definitions into the two Libraries, the catalog and the drawing template, and
-// refuses to produce anything that would break in Excalidraw.
+// Turns Symbol definitions into the two Libraries, the catalog, the drawing template and the
+// rotate script, and refuses to produce anything that would break in Excalidraw.
 import { createHash } from "node:crypto";
 import { FONT, GRID, INK, STROKE, bounds, ceilToGrid, floorToGrid, gridAnchor, pinShapes, text } from "./primitives.ts";
 import type { Pin, Shape } from "./primitives.ts";
+import { rotateSelectionQuarterTurn } from "./rotate.ts";
 
 export type SymbolDefinition = {
   name: string;
@@ -197,6 +198,12 @@ const buildTemplate = () => {
   ].join("\n");
 };
 
+// Marks the scripts the Generator installs, so --install never replaces a script of the user's.
+export const SCRIPT_MARKER = "// excalidraw-electronics script";
+
+const buildRotateScript = () =>
+  [SCRIPT_MARKER, rotateSelectionQuarterTurn.toString(), `await ${rotateSelectionQuarterTurn.name}(ea);`, ""].join("\n");
+
 export function build(definitions: SymbolDefinition[]) {
   const items = definitions.map((def) => ({ def, item: buildItem(def) }));
   const ofKind = (kind: SymbolDefinition["kind"]) => items.filter(({ def }) => def.kind === kind).map(({ item }) => item);
@@ -207,5 +214,6 @@ export function build(definitions: SymbolDefinition[]) {
     rfBlocks: library(rfBlocks),
     catalog: buildCatalog([...schematic, ...rfBlocks]),
     template: buildTemplate(),
+    rotateScript: buildRotateScript(),
   };
 }
