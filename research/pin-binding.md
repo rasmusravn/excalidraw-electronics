@@ -75,9 +75,9 @@ The wire is the **arrow tool with no arrowheads** (`startArrowhead`/`endArrowhea
 - In `_simple`: if the dragged endpoint is **inside** the hovered bindable element, it binds `"inside"` at
   that point. If it is outside but within binding distance, it binds `"orbit"`. Holding **Alt**
   forces `"inside"` binding
-  ([binding.ts#L830-L880](https://github.com/excalidraw/excalidraw/blob/1919728724a1b71af73cb7e6d2d1a418a1415b1c/packages/element/src/binding.ts#L819-L880)).
+  ([binding.ts#L830-L880](https://github.com/excalidraw/excalidraw/blob/1919728724a1b71af73cb7e6d2d1a418a1415b1c/packages/element/src/binding.ts#L830-L880)).
   With grid mode on, the hit test uses the pointer position
-  ([binding.ts#L733-L740](https://github.com/excalidraw/excalidraw/blob/1919728724a1b71af73cb7e6d2d1a418a1415b1c/packages/element/src/binding.ts#L731-L740)).
+  ([binding.ts#L733-L740](https://github.com/excalidraw/excalidraw/blob/1919728724a1b71af73cb7e6d2d1a418a1415b1c/packages/element/src/binding.ts#L733-L740)).
   If the pin target's centre is on the grid, a grid-snapped endpoint lands on it exactly.
 - Binding distance is 15 px, rising to 30 px when zoomed out
   ([binding.ts#L133-L143](https://github.com/excalidraw/excalidraw/blob/1919728724a1b71af73cb7e6d2d1a418a1415b1c/packages/element/src/binding.ts#L133-L143)).
@@ -105,13 +105,13 @@ The wire is the **arrow tool with no arrowheads** (`startArrowhead`/`endArrowhea
   Resize and rotate do the same in `resizeElements.ts` (calls at L119, L156, L460, L984, L1553).
 - Library insertion (`addElementsFromPasteOrLibrary`) runs the items through `restoreElements`
   and then `duplicateAtSceneCoords`, which gives fresh ids and keeps the shared `groupIds`
-  ([App.tsx#L4584-L4625](https://github.com/excalidraw/excalidraw/blob/1919728724a1b71af73cb7e6d2d1a418a1415b1c/packages/excalidraw/components/App.tsx#L4592-L4625)).
+  ([App.tsx#L4584-L4625](https://github.com/excalidraw/excalidraw/blob/1919728724a1b71af73cb7e6d2d1a418a1415b1c/packages/excalidraw/components/App.tsx#L4584-L4625)).
   Library items hold no wires, so there are no bindings to remap on insert.
 
 ### Elbow arrows
 - Elbow arrows always bind in `"orbit"` mode
   (`bindingStrategyForElbowArrowEndpointDragging`,
-  [binding.ts#L267-L315](https://github.com/excalidraw/excalidraw/blob/1919728724a1b71af73cb7e6d2d1a418a1415b1c/packages/element/src/binding.ts#L268-L315)).
+  [binding.ts#L267-L315](https://github.com/excalidraw/excalidraw/blob/1919728724a1b71af73cb7e6d2d1a418a1415b1c/packages/element/src/binding.ts#L267-L315)).
   While dragging, the endpoint snaps to the outline (`bindPointToSnapToElementOutline`). After that it
   follows its `fixedPoint`
   ([elbowArrow.ts#L2214-L2251](https://github.com/excalidraw/excalidraw/blob/1919728724a1b71af73cb7e6d2d1a418a1415b1c/packages/element/src/elbowArrow.ts#L2214-L2251)).
