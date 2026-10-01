@@ -1,0 +1,49 @@
+# Publishing a release is one tag push: git tag v1.2.0 && git push origin v1.2.0
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 26
+
+      - name: Check the tag matches package.json
+        run: |
+          version="v$(node -p "require('./package.json').version")"
+          if [ "$version" != "$GITHUB_REF_NAME" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME doesn't match package.json's version ($version)"
+            exit 1
+          fi
+
+      - run: npm ci
+      - run: npm test
+
+      # The build clears out/ first, so only this build's files are in it.
+      - run: npm run build
+
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            --title "$GITHUB_REF_NAME" \
+            --generate-notes \
+            --verify-tag \
+            out/electronics-schematic.excalidrawlib \
+            out/electronics-rf-blocks.excalidrawlib \
+            out/catalog.excalidraw \
+            out/Template.excalidraw.md \
+            out/Rotate-90-degrees.md \
+            out/Square-Wires.md \
+            out/Install-IEC-Electronics-Kit.md
