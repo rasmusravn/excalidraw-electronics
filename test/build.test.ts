@@ -80,3 +80,11 @@ test("build throws when roughness is not set explicitly", () => {
   const rough = wire("No roughness", { shapes: [{ ...line([0, 0], [40, 0]), roughness: undefined }] });
   assert.throws(() => build([rough]), /No roughness: element without an explicit roughness/);
 });
+
+test("the Proof's Schematic symbols are in the schematic Library, each ANSI Variant right after its IEC Symbol", () => {
+  const names = build(definitions).schematic.libraryItems.map((item) => item.name);
+  for (const name of ["Resistor", "Resistor (ANSI)", "Capacitor", "NPN transistor", "Signal ground"]) {
+    assert.ok(names.includes(name), name);
+  }
+  assert.equal(names.indexOf("Resistor (ANSI)"), names.indexOf("Resistor") + 1);
+});
