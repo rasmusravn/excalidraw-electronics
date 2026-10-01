@@ -21,6 +21,23 @@ A Symbol for a discrete circuit element (R, L, C, diode, transistor, op-amp, sou
 **Block symbol**:
 A Symbol for an RF/system function block (amplifier, mixer, filter, oscillator, coupler, antenna, ADC). Used in block diagrams rather than circuit schematics.
 
+**Pin**:
+A point on a Symbol where a Wire connects. Pin ends always sit on the 20px grid.
+_Avoid_: terminal, port, lead (a lead is the line drawn out to the Pin)
+
+**Pin target**:
+An invisible element at a Pin that a Wire end can attach to, so the Wire follows when the Symbol moves.
+
+**Wire**:
+A connection drawn between Pins. Only Wires drawn with the arrow tool (no arrowheads) attach to Pin targets.
+_Avoid_: net, trace, connection
+
+**Pin stub**:
+A standalone library item made of a lead and its Pin target. The user places copies along a generic IC box, so one box serves any pin count.
+
+**Core** / **Later**:
+The two tiers of the Component list. Core Components are in the first full Library; Later Components are planned for afterwards.
+
 **Library**:
 The importable Excalidraw library file containing every Symbol as a library item.
 
@@ -33,5 +50,7 @@ A small subset of Symbols, generated and imported into Excalidraw, that shows th
 ## Relationships
 
 - A **Component** has one or more **Symbols**, one per **Variant**
+- A **Symbol** has one or more **Pins**; each **Pin** may carry a **Pin target**
+- A **Wire** joins two **Pins**
 - The **Generator** produces the **Library** from all **Symbols**
 - The **Proof** is a subset of the **Library**, produced by the same **Generator**
