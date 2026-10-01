@@ -1,4 +1,4 @@
-import { ellipse, INK, line, pin, polygon, rect, text, LEFT, RIGHT, UP } from "../primitives.ts";
+import { ellipse, INK, line, pin, polygon, rect, text, RIGHT, UP } from "../primitives.ts";
 import type { Pin, Shape } from "../primitives.ts";
 import type { SymbolDefinition } from "../build.ts";
 import { throughPins } from "./blocks.ts";

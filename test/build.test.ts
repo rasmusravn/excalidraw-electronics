@@ -200,6 +200,7 @@ test("the Core gain, frequency and filtering blocks are in the RF-blocks Library
     "Amplifier", "Variable-gain amplifier", "Mixer", "Oscillator", "VCO", "PLL synthesizer",
     "Low-pass filter", "High-pass filter", "Band-pass filter", "Band-stop filter", "Attenuator", "Variable attenuator",
   ];
+  assert.equal(names[0], "Amplifier");
   assert.deepEqual(coreFrom(names, "Amplifier", family.length), family);
   assert.equal(names.at(-1), "RF port");
 });
@@ -216,6 +217,7 @@ test("the four filters differ in their wave marks alone", () => {
 
 test("the whole Core RF-blocks Library is in the spec's order", () => {
   const names = build(definitions).rfBlocks.libraryItems.map((item) => item.name);
+  assert.equal(names[0], "Amplifier");
   assert.deepEqual(coreFrom(names, "Amplifier", names.length), [
     "Amplifier", "Variable-gain amplifier", "Mixer", "Oscillator", "VCO", "PLL synthesizer",
     "Low-pass filter", "High-pass filter", "Band-pass filter", "Band-stop filter", "Attenuator", "Variable attenuator",
