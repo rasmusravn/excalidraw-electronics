@@ -7,6 +7,7 @@
   "scripts": {
     "build": "node src/cli.ts",
     "install-vault": "node src/cli.ts --install",
+    "package": "node src/cli.ts && cd out && rm -rf extras obsidian-extras.zip && mkdir -p extras/Excalidraw/Scripts && cp Template.excalidraw.md extras/Excalidraw/ && cp 'Rotate 90 degrees.md' 'Square Wires.md' extras/Excalidraw/Scripts/ && cd extras && zip -qr ../obsidian-extras.zip Excalidraw",
     "typecheck": "tsc",
     "pretest": "node test/bundle-upstream.ts",
     "test": "node --test test/*.test.ts"

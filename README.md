@@ -18,10 +18,10 @@ Download the files from the latest [release](https://github.com/rasmusravn/excal
 
 If the vault syncs with Obsidian Sync, turn on *Sync all other types* under Settings, Sync, on every device: `.excalidrawlib` and `.excalidraw` files are skipped otherwise.
 
-**Optional extras**, also attached to the release:
+**Optional extras**, in `obsidian-extras.zip` on the release. Unzip it into the vault's root folder; it holds:
 
-- `Template.excalidraw.md`: put it at `Excalidraw/Template.excalidraw.md`, the plugin's default template path. New drawings then start with the 20px grid on and the arrow tool drawing Wires: elbow arrows with no arrowheads.
-- `Rotate 90 degrees.md` and `Square Wires.md`: put them in the plugin's script folder (`Excalidraw/Scripts/`). Each becomes a command; bind Ctrl/Cmd+R to Rotate 90 degrees and Alt+W to Square Wires under Settings, Hotkeys. Rotate 90 degrees turns the selected Symbols exactly a quarter turn, keeping their Pins on the grid and their Wires attached.
+- `Excalidraw/Template.excalidraw.md`, the plugin's default template path. New drawings then start with the 20px grid on and the arrow tool drawing Wires: elbow arrows with no arrowheads.
+- `Excalidraw/Scripts/Rotate 90 degrees.md` and `Excalidraw/Scripts/Square Wires.md`. Each becomes a command; bind Ctrl/Cmd+R to Rotate 90 degrees and Alt+W to Square Wires under Settings, Hotkeys. Rotate 90 degrees turns the selected Symbols exactly a quarter turn, keeping their Pins on the grid and their Wires attached. If the plugin's script folder isn't `Excalidraw/Scripts`, move the two scripts there.
 
 ## How to wire
 
@@ -48,6 +48,7 @@ The Library is made by a Generator: each Symbol is a small TypeScript module bui
 npm install
 npm run build          # writes everything to out/
 npm run install-vault  # also installs it all into the vault named by VAULT in .env
+npm run package        # also zips the template and scripts into out/obsidian-extras.zip for a release
 npm test               # imports the Library through the Obsidian fork's and upstream Excalidraw's own code
 npm run typecheck
 ```
