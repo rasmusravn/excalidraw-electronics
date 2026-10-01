@@ -25,18 +25,19 @@ export const npn = transistor("NPN transistor", [...base, upper, lower, arrowhea
 // B (0,40), E (40,0), C (40,80). The emitter arrow points in, towards the base.
 export const pnp = transistor("PNP transistor", [...base, upper, lower, arrowhead([40, 20], [24, 34], 0.7)], "BFT92");
 
-// Enhancement MOSFETs: the gate apart from a channel broken in three; G (0,40), D (40,0), S (40,80).
-// The body arrow points into the channel for N, out of it for P; the body joins the source.
+// Enhancement MOSFETs: the gate apart from a channel broken in three, the gate at (0,40). The body
+// arrow points into the channel for N, out of it for P; the body joins the source.
 const gate = [line([0, 40], [20, 40]), line([20, 24], [20, 56])];
 const channel = [line([26, 24], [26, 32]), line([26, 36], [26, 44]), line([26, 48], [26, 56])];
 const drainAndSource = [line([26, 28], [40, 28], [40, 0]), line([26, 52], [40, 52], [40, 80])];
 const body = line([26, 40], [40, 40]);
+// N-channel: D (40,0), S (40,80).
 export const nMosfet = transistor(
   "N-MOSFET",
   [...gate, ...channel, ...drainAndSource, body, line([40, 40], [40, 52]), arrowhead([40, 40], [26, 40], 1, 6)],
   "BSS138",
 );
-// P-channel: the source on top, so the body joins upwards.
+// P-channel: S (40,0), D (40,80); the source is on top, so the body joins upwards.
 export const pMosfet = transistor(
   "P-MOSFET",
   [...gate, ...channel, ...drainAndSource, body, line([40, 40], [40, 28]), arrowhead([26, 40], [40, 40], 1, 6)],
