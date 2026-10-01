@@ -54,3 +54,7 @@ npm run typecheck
 ```
 
 Copy `.env.example` to `.env` and set `VAULT`. `install-vault` copies the Libraries into `Excalidraw/Libraries/`, the catalog into `Electronics/`, the template to `Excalidraw/Template.excalidraw.md` and the scripts into the plugin's script folder, and binds Ctrl/Cmd+R and Alt+W when those hotkeys are free. It never replaces a template or script you made yourself. Reload Obsidian after the first install so it picks up the hotkeys.
+
+## Licence
+
+The code and the Symbols are MIT licensed (see `LICENSE`). The Cascadia Code font in `fonts/` is Microsoft's, under the SIL Open Font License 1.1 (see `fonts/OFL.txt`); the released Library files contain no font data.
