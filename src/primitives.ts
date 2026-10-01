@@ -89,10 +89,9 @@ const measure = (str: string) => {
   font ??= createRequire(import.meta.url)("fontkit").openSync(
     fileURLToPath(new URL("../fonts/Cascadia.woff2", import.meta.url)),
   ) as Font;
-  return {
-    width: Math.ceil((font.layout(str).advanceWidth / font.unitsPerEm) * FONT.size),
-    height: FONT.size * FONT.lineHeight,
-  };
+  const lines = str.split("\n");
+  const widths = lines.map((l) => (font!.layout(l).advanceWidth / font!.unitsPerEm) * FONT.size);
+  return { width: Math.ceil(Math.max(...widths)), height: lines.length * FONT.size * FONT.lineHeight };
 };
 
 export const text = (x: number, y: number, str: string, align: "left" | "center" = "left"): Shape => {

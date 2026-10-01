@@ -119,3 +119,12 @@ test("the sketchy build is hand-drawn and has its own ids, so it never replaces 
   }
   assert.deepEqual(items(sketchy).map((item) => item.name), items(clean).map((item) => item.name));
 });
+
+test("the catalog carries the how-to-wire note, sized to its text", () => {
+  const note = build(definitions).catalog.elements.find((e) => e.type === "text" && String(e.text).startsWith("How to wire"));
+  assert.ok(note, "note");
+  for (const rule of ["elbow", "no arrowheads", "along its lead", "about 10px off", "between grid lines", "Line tool"]) {
+    assert.ok(String(note.text).includes(rule), rule);
+  }
+  assert.ok(note.height >= String(note.text).split("\n").length * 14 * 1.2);
+});

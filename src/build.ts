@@ -141,10 +141,26 @@ const library = (libraryItems: LibraryItem[]): Library => ({
   libraryItems,
 });
 
-// One row per Library, every item with its name underneath, all on the grid.
+// Also in the README.
+const HOW_TO_WIRE = `How to wire
+- Draw Wires with the arrow tool set to elbow, with no arrowheads.
+  Drawings started from the template already are.
+- Drag each Wire end to a Pin along its lead. It ends on the Pin dot,
+  stays attached and stays at right angles when the Symbol moves.
+- Turn Symbols with Ctrl/Cmd+R (Rotate 90 degrees), not the rotate handle.
+
+Limits
+- Approaching a Pin from the side leaves the Wire end about 10px off.
+- Elbow bends may land between grid lines.
+- Straight (non-elbow) arrows attach at an offset.
+- Lines drawn with the Line tool never attach.`;
+
+// The how-to-wire note, then one row per Library, every item with its name underneath, all on the grid.
 const buildCatalog = (rows: LibraryItem[][]): Drawing => {
   const shapes: { shape: Shape; key: string; groupIds: string[] }[] = [];
-  let top = 0;
+  const note = text(0, 0, HOW_TO_WIRE);
+  shapes.push({ shape: note, key: "catalog:how-to-wire", groupIds: [] });
+  let top = floorToGrid(note.height) + 4 * GRID;
   for (const items of rows.filter((row) => row.length > 0)) {
     const height = Math.max(...items.map((item) => bounds(item.elements).maxY));
     const captionY = top + floorToGrid(height) + 2 * GRID;
