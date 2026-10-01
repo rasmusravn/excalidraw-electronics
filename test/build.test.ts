@@ -197,7 +197,7 @@ test("the supply rail's label is editable text", () => {
 test("the Core gain, frequency and filtering blocks are in the RF-blocks Library in the spec's order", () => {
   const names = build(definitions).rfBlocks.libraryItems.map((item) => item.name);
   const family = [
-    "Amplifier", "Variable-gain amplifier", "Mixer", "Oscillator", "VCO", "PLL synthesizer",
+    "Amplifier", "Variable-gain amplifier", "Mixer", "Oscillator", "Local oscillator", "VCO", "PLL synthesizer",
     "Low-pass filter", "High-pass filter", "Band-pass filter", "Band-stop filter", "Attenuator", "Variable attenuator",
   ];
   assert.equal(names[0], "Amplifier");
@@ -219,7 +219,7 @@ test("the whole Core RF-blocks Library is in the spec's order", () => {
   const names = build(definitions).rfBlocks.libraryItems.map((item) => item.name);
   assert.equal(names[0], "Amplifier");
   assert.deepEqual(coreFrom(names, "Amplifier", names.length), [
-    "Amplifier", "Variable-gain amplifier", "Mixer", "Oscillator", "VCO", "PLL synthesizer",
+    "Amplifier", "Variable-gain amplifier", "Mixer", "Oscillator", "Local oscillator", "VCO", "PLL synthesizer",
     "Low-pass filter", "High-pass filter", "Band-pass filter", "Band-stop filter", "Attenuator", "Variable attenuator",
     "2-way splitter/combiner", "Directional coupler", "Circulator", "Isolator",
     "Antenna", "SPDT RF switch", "SP4T RF switch",
@@ -290,4 +290,15 @@ test("the Later filter variants and digital blocks sit in their families, tagged
   for (const name of ["Tunable band-pass filter", "Notch filter", "SAW/BAW filter", "FPGA", "DSP", "NCO", "FFT"]) {
     assert.equal(definitions.find((d) => d.name === name)?.tier, "Later", name);
   }
+});
+
+test("the local oscillator follows the oscillator: a circle with a sine, its one Pin on top pointing up", () => {
+  const names = build(definitions).rfBlocks.libraryItems.map((item) => item.name);
+  assert.equal(names[names.indexOf("Oscillator") + 1], "Local oscillator");
+  const lo = definitions.find((d) => d.name === "Local oscillator")!;
+  assert.equal(lo.pins.length, 1);
+  const [p] = lo.pins;
+  const lowest = Math.min(...lo.shapes.flatMap((s) => [s.y, ...((s.points as number[][] | undefined) ?? []).map((q) => s.y + q[1])]));
+  assert.equal(p.y, lowest, "the Pin is the topmost point");
+  assert.deepEqual(p.dir, [0, 1], "its lead runs down from the Pin into the circle");
 });

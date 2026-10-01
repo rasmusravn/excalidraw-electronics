@@ -1,4 +1,4 @@
-import { arrowhead, ellipse, FONT, INK, line, pin, polygon, rect, text, LEFT, RIGHT, UP } from "../primitives.ts";
+import { arrowhead, ellipse, FONT, INK, line, pin, polygon, rect, text, DOWN, LEFT, RIGHT, UP } from "../primitives.ts";
 import type { Point } from "../primitives.ts";
 import type { SymbolDefinition } from "../build.ts";
 
@@ -80,6 +80,14 @@ export const oscillator = block(
   [box, generatorWave, line([60, 0], [80, 0]), text(40, 4.8, "OSC", "center")],
   [pin(80, 0, LEFT)],
 );
+// A local oscillator: a circle with a sine, its output Pin on top at (0,0), so it can sit under a
+// mixer and feed its LO input straight up. The label goes to the right of the circle.
+export const localOscillator = block(
+  "Local oscillator",
+  [line([0, 0], [0, 20]), ellipse(0, 40, 20), sine(-12, 40, 24, 6), text(26, 40 - LINE_HEIGHT / 2, "LO")],
+  [pin(0, 0, DOWN)],
+);
+
 // Tuned by a control voltage from below, Pin at (40,40). The sine sits up-left, clear of the
 // arrow; the label goes below, beside the control lead.
 export const vco = block(
