@@ -2,9 +2,10 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { build } from "../src/build.ts";
 import { definitions } from "../src/definitions.ts";
-import { GRID } from "../src/primitives.ts";
-import type { Library } from "../src/build.ts";
+import { GRID, LEFT, RIGHT, line, pin } from "../src/primitives.ts";
+import type { Library, SymbolDefinition } from "../src/build.ts";
 import { libraryBlob, loadExcalidraw } from "./excalidraw.ts";
+import type { Excalidraw } from "./excalidraw.ts";
 
 export function importSuite(which: "fork" | "upstream") {
   const blob = (lib: Library) => libraryBlob(lib);
@@ -46,6 +47,46 @@ export function importSuite(which: "fork" | "upstream") {
         for (const [x, y] of pins) {
           assert.ok((x - minX) % GRID === 0 && (y - minY) % GRID === 0,
             `${item.name}: Pin (${x}, ${y}) is not on the grid from top-left (${minX}, ${minY})`);
+        }
+      }
+    }
+  });
+
+  // What Excalidraw's rotateMultipleElements does: every element's centre turns about the centre of
+  // the selection's bounding box, and the element takes on the angle.
+  const rotate = (L: Excalidraw, elements: Record<string, any>[], angle: number) => {
+    const [minX, minY, maxX, maxY] = L.getCommonBounds(elements);
+    const [cx, cy] = [(minX + maxX) / 2, (minY + maxY) / 2];
+    const [cos, sin] = [Math.round(Math.cos(angle)), Math.round(Math.sin(angle))];
+    const turn = (x: number, y: number) => [cx + (x - cx) * cos - (y - cy) * sin, cy + (x - cx) * sin + (y - cy) * cos];
+    return elements.map((e) => {
+      const [x1, y1, x2, y2] = L.getCommonBounds([{ ...e, angle: 0 }]);
+      const [ex, ey] = [(x1 + x2) / 2, (y1 + y2) / 2];
+      const [rx, ry] = turn(ex, ey);
+      const pinEnd = e.customData?.pinEnd && [e.customData.pinEnd[0] * cos - e.customData.pinEnd[1] * sin, e.customData.pinEnd[0] * sin + e.customData.pinEnd[1] * cos];
+      return { ...e, x: e.x + rx - ex, y: e.y + ry - ey, angle: e.angle + angle, ...(pinEnd && { customData: { pinEnd } }) };
+    });
+  };
+
+  test(`${which}: a quarter turn keeps every Pin and the item's top-left on the grid`, async () => {
+    const L = await loadExcalidraw(which);
+    // Its box is 5 grid cells wide and 2 high, so it needs padding to turn on the grid.
+    const oddBox: SymbolDefinition = {
+      name: "Odd box", variant: "IEC", tier: "Core", kind: "Schematic",
+      shapes: [line([0, 0], [60, 0])], pins: [pin(0, 0, RIGHT), pin(60, 0, LEFT)],
+    };
+    for (const lib of [...libraries(), build([oddBox]).schematic]) {
+      for (const item of await L.loadLibraryFromBlob(blob(lib), "unpublished")) {
+        let elements = L.restoreElements(item.elements, null);
+        for (const turn of [1, 2, 3]) {
+          elements = L.restoreElements(rotate(L, elements, Math.PI / 2), null);
+          const [minX, minY] = L.getCommonBounds(elements);
+          // Excalidraw's own trigonometry leaves noise far below a pixel.
+          const onGrid = (n: number) => Math.abs(n - Math.round(n / GRID) * GRID) < 1e-9;
+          assert.ok(onGrid(minX) && onGrid(minY), `${item.name} after ${turn} turns: top-left (${minX}, ${minY})`);
+          for (const [x, y] of pinEnds(elements)) {
+            assert.ok(onGrid(x) && onGrid(y), `${item.name} after ${turn} turns: Pin (${x}, ${y})`);
+          }
         }
       }
     }

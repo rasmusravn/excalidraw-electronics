@@ -1,7 +1,7 @@
 // Turns Symbol definitions into the two Libraries, the catalog and the drawing template, and
 // refuses to produce anything that would break in Excalidraw.
 import { createHash } from "node:crypto";
-import { FONT, GRID, INK, STROKE, bounds, floorToGrid, gridAnchor, pinShapes, text } from "./primitives.ts";
+import { FONT, GRID, INK, STROKE, bounds, ceilToGrid, floorToGrid, gridAnchor, pinShapes, text } from "./primitives.ts";
 import type { Pin, Shape } from "./primitives.ts";
 
 export type SymbolDefinition = {
@@ -82,9 +82,15 @@ const itemName = (def: SymbolDefinition) => (def.variant === "ANSI" ? `${def.nam
 const buildItem = (def: SymbolDefinition): LibraryItem => {
   const name = itemName(def);
   const shapes = [...def.shapes, ...def.pins.flatMap(pinShapes)];
-  const { minX, minY } = bounds(shapes);
+  const { minX, minY, maxX, maxY } = bounds(shapes);
   const ax = floorToGrid(minX);
   const ay = floorToGrid(minY);
+  // Excalidraw rotates about the bounding-box centre. With width and height the same parity in
+  // grid cells, that centre is a grid point or the middle of a grid cell, so quarter turns keep
+  // the Pins and the box's top-left on the grid.
+  const bx = ceilToGrid(maxX);
+  let by = ceilToGrid(maxY);
+  if (((bx - ax) / GRID + (by - ay) / GRID) % 2 !== 0) by += GRID;
 
   for (const p of def.pins) {
     if ((p.x - ax) % GRID !== 0 || (p.y - ay) % GRID !== 0) {
@@ -93,7 +99,8 @@ const buildItem = (def: SymbolDefinition): LibraryItem => {
   }
 
   // Move everything so the grid anchor sits at the origin.
-  const normalised = [gridAnchor(ax, ay), ...shapes].map((s) => ({ ...s, x: s.x - ax, y: s.y - ay }));
+  const anchors = [gridAnchor(ax, ay), gridAnchor(bx - 1, by)];
+  const normalised = [...anchors, ...shapes].map((s) => ({ ...s, x: s.x - ax, y: s.y - ay }));
   const key = `${def.name}:${def.variant}`;
   return {
     id: hashId(`${key}:item`),

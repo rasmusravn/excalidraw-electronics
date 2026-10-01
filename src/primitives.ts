@@ -147,8 +147,9 @@ export const pinShapes = ({ x, y, dir }: Pin): Shape[] => {
   return [target, polygon(dot)];
 };
 
-// An invisible 1px line. Placement snaps an item's bounding-box top-left to the grid; with this
+// An invisible 1px line. Placement snaps an item's bounding-box top-left to the grid; with one
 // at a grid point above-left of everything, that top-left is the anchor and Pins stay on the grid.
+// A second one at the bottom-right fixes the box's centre, which rotation turns about.
 export const gridAnchor = (x: number, y: number): Shape => linear([[x, y], [x + 1, y]], { opacity: 0 });
 
 export const bounds = (shapes: Shape[]) => {
@@ -169,3 +170,4 @@ export const bounds = (shapes: Shape[]) => {
 };
 
 export const floorToGrid = (n: number) => Math.floor(n / GRID) * GRID;
+export const ceilToGrid = (n: number) => Math.ceil(n / GRID) * GRID;
