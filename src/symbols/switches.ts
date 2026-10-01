@@ -24,9 +24,9 @@ export const spdt = switchOf(
   [pin(0, 20, RIGHT), pin(80, 0, LEFT), pin(80, 40, LEFT)],
 );
 
-// A push-to-make contact: a bridging bar lifted above the gap, with its plunger.
+// IEC 60617 push-button make contact: the SPST blade, linked by a dashed line to a push actuator.
 export const pushButton = switchOf(
   "Push button",
-  [...leads, line([20, -6], [60, -6]), line([40, -6], [40, -18]), line([33, -18], [47, -18])],
-  -18,
+  [...leads, line([20, 0], [57, -14]), { ...line([46, -9.8], [46, -24]), strokeStyle: "dashed" }, line([40, -24], [52, -24])],
+  -24,
 );

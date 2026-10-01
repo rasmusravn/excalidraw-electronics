@@ -20,10 +20,10 @@ const plus = (x: number, y: number) => [line([x - 3, y], [x + 3, y]), line([x, y
 // IEC 60617: a circle with the conductor running through it.
 export const dcSource = source("DC voltage source", [...circled, line([0, 20], [0, 60]), ...plus(10, 10)], "V?", "5V");
 
-// The long plate is positive.
+// The long thin plate is positive, the short thick one negative.
 export const battery = source(
   "Battery",
-  [line([0, 0], [0, 36]), line([-14, 36], [14, 36]), line([-7, 44], [7, 44]), line([0, 44], [0, 80]), ...plus(10, 28)],
+  [line([0, 0], [0, 36]), line([-14, 36], [14, 36]), { ...line([-7, 44], [7, 44]), strokeWidth: 3 }, line([0, 44], [0, 80]), ...plus(10, 28)],
   "BT?",
   "9V",
   20,
