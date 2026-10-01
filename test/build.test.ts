@@ -216,7 +216,7 @@ test("the whole RF-blocks Library is in the spec's order", () => {
   assert.deepEqual(names, [
     "Amplifier", "Variable-gain amplifier", "Mixer", "Oscillator", "VCO", "PLL synthesizer",
     "Low-pass filter", "High-pass filter", "Band-pass filter", "Band-stop filter", "Attenuator", "Variable attenuator",
-    "2-way splitter", "Directional coupler", "Circulator", "Isolator",
+    "2-way splitter/combiner", "Directional coupler", "Circulator", "Isolator",
     "Antenna", "SPDT RF switch", "SP4T RF switch",
     "ADC", "DAC", "Phase shifter", "Frequency multiplier", "Frequency divider", "Limiter", "Detector",
     "50Ω termination", "DC block", "Bias tee",

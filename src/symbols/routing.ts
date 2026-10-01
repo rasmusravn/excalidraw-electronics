@@ -11,7 +11,7 @@ const below = (label: string, x = 40) => text(x, 24, label, "center");
 // Input on the left at (0,0), outputs on the right at (80,-20) and (80,20); the paths fork inside a
 // 40×60 box. Run backwards, it's a combiner.
 export const splitter = block(
-  "2-way splitter",
+  "2-way splitter/combiner",
   [
     line([0, 0], [20, 0]),
     rect(20, -30, 40, 60),
@@ -35,7 +35,7 @@ export const coupler = block(
     line([26, 8], [40, 8], [40, 20]),
     arrowhead([40, 8], [40, 20], 1, 5),
     line([40, 20], [40, 40]),
-    text(54, -20 - LINE_HEIGHT, "-20dB"),
+    text(54, -20 - LINE_HEIGHT, "CPL"),
   ],
   [pin(0, 0, RIGHT), pin(80, 0, LEFT), pin(40, 40, UP)],
 );
@@ -77,10 +77,12 @@ export const rfSwitchSp4t = rfSwitch("SP4T RF switch", [-40, -20, 20, 40]);
 
 // --- Conversion: 2-Pin 40×40 boxes between 20px leads ---
 
+// IEC: a box split by a diagonal, the input's letter above it and the output's below. The letters
+// are the mark; the block's label goes below the box.
 const converter = (name: string, from: string, to: string) =>
   block(
     name,
-    [...leads, box, line([20, 20], [60, -20]), text(29, -16, from, "center"), text(51, -2, to, "center")],
+    [...leads, box, line([20, 20], [60, -20]), text(29, -16, from, "center"), text(51, -2, to, "center"), below(name)],
     throughPins,
   );
 export const adc = converter("ADC", "A", "D");
