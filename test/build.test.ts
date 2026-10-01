@@ -92,7 +92,8 @@ test("the Proof's Schematic symbols are in the schematic Library, each ANSI Vari
 test("the Proof's Block symbols are in the RF-blocks Library and the catalog", () => {
   const { rfBlocks, schematic, catalog } = build(definitions);
   const names = rfBlocks.libraryItems.map((item) => item.name);
-  assert.deepEqual(names, ["Amplifier", "Mixer", "Band-pass filter", "Antenna", "RF port"]);
+  const proof = ["Amplifier", "Mixer", "Band-pass filter", "Antenna", "RF port"];
+  for (const name of proof) assert.ok(names.includes(name), name);
   assert.ok(schematic.libraryItems.every((item) => !names.includes(item.name)));
   const captions = catalog.elements.filter((e) => e.type === "text").map((e) => e.text);
   for (const name of names) assert.ok(captions.includes(name), name);
@@ -188,4 +189,24 @@ test("the Core sources, grounds, rail and switches follow the amplifiers in the 
 test("the supply rail's label is editable text", () => {
   const rail = build(definitions).schematic.libraryItems.find((i) => i.name === "Supply rail")!;
   assert.ok(rail.elements.some((e) => e.type === "text" && e.text === "VCC"));
+});
+
+test("the Core gain, frequency and filtering blocks are in the RF-blocks Library in the spec's order", () => {
+  const names = build(definitions).rfBlocks.libraryItems.map((item) => item.name);
+  const family = [
+    "Amplifier", "Variable-gain amplifier", "Mixer", "Oscillator", "VCO", "PLL synthesizer",
+    "Low-pass filter", "High-pass filter", "Band-pass filter", "Band-stop filter", "Attenuator", "Variable attenuator",
+  ];
+  assert.deepEqual(names.slice(0, family.length), family);
+  assert.equal(names.at(-1), "RF port");
+});
+
+test("the four filters differ in their wave marks alone", () => {
+  const items = build(definitions).rfBlocks.libraryItems;
+  const marks = ["Low-pass filter", "High-pass filter", "Band-pass filter", "Band-stop filter"].map((name) => {
+    const item = items.find((i) => i.name === name)!;
+    // The drawing without its label, ids or position: just the shapes' geometry.
+    return JSON.stringify(item.elements.filter((e) => e.type !== "text").map((e) => [e.type, e.x, e.y, e.points]));
+  });
+  assert.equal(new Set(marks).size, 4);
 });

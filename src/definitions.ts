@@ -22,7 +22,22 @@ import { chassisGround, earthGround, signalGround, supplyRail } from "./symbols/
 import { acSource, battery, currentSource, dcSource } from "./symbols/sources.ts";
 import { pushButton, spdt, spst } from "./symbols/switches.ts";
 import { icBox, junctionDot, junctionT, pinStub } from "./symbols/ic.ts";
-import { amplifier, antenna, bandPassFilter, mixer, rfPort } from "./symbols/blocks.ts";
+import {
+  amplifier,
+  antenna,
+  attenuator,
+  bandPassFilter,
+  bandStopFilter,
+  highPassFilter,
+  lowPassFilter,
+  mixer,
+  oscillator,
+  pll,
+  rfPort,
+  variableAttenuator,
+  vco,
+  vga,
+} from "./symbols/blocks.ts";
 
 export const definitions: SymbolDefinition[] = [
   resistor,
@@ -68,8 +83,17 @@ export const definitions: SymbolDefinition[] = [
   junctionDot,
   junctionT,
   amplifier,
+  vga,
   mixer,
+  oscillator,
+  vco,
+  pll,
+  lowPassFilter,
+  highPassFilter,
   bandPassFilter,
+  bandStopFilter,
+  attenuator,
+  variableAttenuator,
   antenna,
   rfPort,
 ];
