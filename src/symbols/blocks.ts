@@ -2,8 +2,8 @@ import { arrowhead, ellipse, FONT, INK, line, pin, polygon, rect, text, LEFT, RI
 import type { Point } from "../primitives.ts";
 import type { SymbolDefinition } from "../build.ts";
 
-const LINE_HEIGHT = FONT.size * FONT.lineHeight;
-const block = (name: string, shapes: SymbolDefinition["shapes"], pins: SymbolDefinition["pins"]): SymbolDefinition => ({
+export const LINE_HEIGHT = FONT.size * FONT.lineHeight;
+export const block = (name: string, shapes: SymbolDefinition["shapes"], pins: SymbolDefinition["pins"]): SymbolDefinition => ({
   name,
   variant: "IEC",
   tier: "Core",
@@ -40,9 +40,9 @@ export const mixer = block(
 );
 
 // 2-Pin blocks: a 40×40 box between 20px leads, Pins at (0,0) and (80,0).
-const leads = [line([0, 0], [20, 0]), line([60, 0], [80, 0])];
-const box = rect(20, -20, 40, 40);
-const throughPins = [pin(0, 0, RIGHT), pin(80, 0, LEFT)];
+export const leads = [line([0, 0], [20, 0]), line([60, 0], [80, 0])];
+export const box = rect(20, -20, 40, 40);
+export const throughPins = [pin(0, 0, RIGHT), pin(80, 0, LEFT)];
 // A diagonal arrow through a body, crossing its outline at both ends: the IEC mark for "variable".
 const arrowThrough = (from: Point, to: Point) => [line(from, to), arrowhead(from, to, 1, 6)];
 const variable = arrowThrough([12, 18], [68, -24]);

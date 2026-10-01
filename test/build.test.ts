@@ -210,3 +210,16 @@ test("the four filters differ in their wave marks alone", () => {
   });
   assert.equal(new Set(marks).size, 4);
 });
+
+test("the whole RF-blocks Library is in the spec's order", () => {
+  const names = build(definitions).rfBlocks.libraryItems.map((item) => item.name);
+  assert.deepEqual(names, [
+    "Amplifier", "Variable-gain amplifier", "Mixer", "Oscillator", "VCO", "PLL synthesizer",
+    "Low-pass filter", "High-pass filter", "Band-pass filter", "Band-stop filter", "Attenuator", "Variable attenuator",
+    "2-way splitter", "Directional coupler", "Circulator", "Isolator",
+    "Antenna", "SPDT RF switch", "SP4T RF switch",
+    "ADC", "DAC", "Phase shifter", "Frequency multiplier", "Frequency divider", "Limiter", "Detector",
+    "50Ω termination", "DC block", "Bias tee",
+    "RF port",
+  ]);
+});
