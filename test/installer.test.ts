@@ -40,6 +40,12 @@ function world(opts: { settings?: Record<string, unknown>; files?: Record<string
     modifyBinary: async (f: { path: string }, c: ArrayBuffer) => (writes.push(f.path), vault.set(f.path, asText(c))),
     create: async (p: string, c: string) => (writes.push(p), vault.set(p, c)),
     createBinary: async (p: string, c: ArrayBuffer) => (writes.push(p), vault.set(p, asText(c))),
+    configDir: ".obsidian",
+    adapter: {
+      exists: async (p: string) => vault.has(p),
+      read: async (p: string) => vault.get(p),
+      write: async (p: string, c: string) => (writes.push(p), vault.set(p, c)),
+    },
   };
   const ea = {
     obsidian: {
@@ -171,4 +177,69 @@ test("the markers the installer looks for are the ones the Generator writes", as
   const { SCRIPT_MARKER, TEMPLATE_MARKER } = await import("../src/build.ts");
   assert.ok(installerBody.includes(`"${SCRIPT_MARKER}"`));
   assert.ok(installerBody.includes(`"${TEMPLATE_MARKER}:"`));
+});
+
+const HOTKEYS = ".obsidian/hotkeys.json";
+const ROTATE = "obsidian-excalidraw-plugin:Rotate 90 degrees";
+const SQUARE = "obsidian-excalidraw-plugin:Square Wires";
+
+test("it binds Ctrl/Cmd+R and Alt+W when they are free, keeping the user's other hotkeys", async () => {
+  const other = { "editor:toggle-bold": [{ modifiers: ["Mod"], key: "B" }] };
+  const w = world({ files: { [HOTKEYS]: JSON.stringify(other) } });
+  await w.run();
+  const hotkeys = JSON.parse(w.vault.get(HOTKEYS)!);
+  assert.deepEqual(hotkeys[ROTATE], [{ modifiers: ["Mod"], key: "R" }]);
+  assert.deepEqual(hotkeys[SQUARE], [{ modifiers: ["Alt"], key: "W" }]);
+  assert.deepEqual(hotkeys["editor:toggle-bold"], other["editor:toggle-bold"]);
+  assert.match(w.notices.at(-1)!, /Bound Ctrl\/Cmd\+R to Rotate 90 degrees/);
+  assert.match(w.notices.at(-1)!, /Reload Obsidian/);
+});
+
+test("it creates hotkeys.json when there is none", async () => {
+  const w = world();
+  await w.run();
+  assert.ok(Object.keys(JSON.parse(w.vault.get(HOTKEYS)!)).includes(ROTATE));
+});
+
+test("a hotkey the user already set for a Command is kept, even a cleared one", async () => {
+  const mine = { [ROTATE]: [{ modifiers: ["Ctrl", "Shift"], key: "T" }], [SQUARE]: [] };
+  const w = world({ files: { [HOTKEYS]: JSON.stringify(mine) } });
+  await w.run();
+  assert.deepEqual(JSON.parse(w.vault.get(HOTKEYS)!), mine);
+  assert.ok(!w.writes.includes(HOTKEYS));
+});
+
+test("a hotkey another command uses is not taken, and the notice says so", async () => {
+  const taken = { "editor:something": [{ modifiers: ["Alt"], key: "w" }] };
+  const w = world({ files: { [HOTKEYS]: JSON.stringify(taken) } });
+  await w.run();
+  const hotkeys = JSON.parse(w.vault.get(HOTKEYS)!);
+  assert.ok(!(SQUARE in hotkeys));
+  assert.deepEqual(hotkeys["editor:something"], taken["editor:something"]);
+  assert.ok(ROTATE in hotkeys);
+  assert.match(w.notices.at(-1)!, /No hotkey for Square Wires: Alt\+W is already used by editor:something/);
+});
+
+test("a hotkeys.json it can't read is left alone", async () => {
+  const w = world({ files: { [HOTKEYS]: "{ not json" } });
+  await w.run();
+  assert.equal(w.vault.get(HOTKEYS), "{ not json");
+  assert.match(w.notices.at(-1)!, /Couldn't read your hotkeys\.json/);
+});
+
+test("a second run changes no hotkeys and still writes nothing", async () => {
+  const w = world();
+  await w.run();
+  w.writes.length = 0;
+  await w.run();
+  assert.deepEqual(w.writes, []);
+});
+
+test("an up-to-date Kit still gets its hotkeys if they were never bound", async () => {
+  const w = world();
+  await w.run();
+  w.vault.delete(HOTKEYS);
+  await w.run();
+  assert.ok(ROTATE in JSON.parse(w.vault.get(HOTKEYS)!));
+  assert.match(w.notices.at(-1)!, /up to date/);
 });

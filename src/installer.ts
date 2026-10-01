@@ -2,7 +2,9 @@
 // with its Excalidraw Automate object as `ea` and `utils` for prompts, so the function must not
 // use anything from outside itself: build() ships its source text. Run from any open drawing, it
 // downloads the latest GitHub release and writes the Kit into the vault; running it again updates.
-// It only replaces files it made: a Template or script of the user's is left alone.
+// It only replaces files it made: a Template or script of the user's is left alone. It also binds
+// Ctrl/Cmd+R and Alt+W to the two Commands in Obsidian's hotkeys.json, never overwriting a hotkey
+// the user set or one already used by another command.
 type Vault = Record<string, any>;
 
 export async function installKit(ea: any, utils: any) {
@@ -46,6 +48,44 @@ export async function installKit(ea: any, utils: any) {
     "Square-Wires.md": "Square Wires.md",
   };
 
+  // Obsidian has no public API for hotkeys; its hotkeys.json maps a command id to its hotkeys. It
+  // reads the file when it starts, so a new binding needs a reload.
+  const bindHotkeys = async (): Promise<string[]> => {
+    const wanted: Record<string, { modifiers: string[]; key: string; label: string }> = {
+      "Rotate 90 degrees": { modifiers: ["Mod"], key: "R", label: "Ctrl/Cmd+R" },
+      "Square Wires": { modifiers: ["Alt"], key: "W", label: "Alt+W" },
+    };
+    const path = `${vault.configDir}/hotkeys.json`;
+    let hotkeys: Record<string, { modifiers: string[]; key: string }[]> = {};
+    if (await vault.adapter.exists(path)) {
+      try {
+        hotkeys = JSON.parse(await vault.adapter.read(path));
+      } catch {
+        return ["Couldn't read your hotkeys.json, so no hotkeys were bound. Bind Ctrl/Cmd+R and Alt+W yourself under Settings, Hotkeys."];
+      }
+    }
+    const same = (a: { modifiers: string[]; key: string }, b: { modifiers: string[]; key: string }) =>
+      a.key.toUpperCase() === b.key.toUpperCase() && a.modifiers.join() === b.modifiers.join();
+    const lines: string[] = [];
+    let changed = false;
+    for (const [name, { label, ...hotkey }] of Object.entries(wanted)) {
+      const id = `obsidian-excalidraw-plugin:${name}`;
+      const takenBy = Object.entries(hotkeys).find(([other, keys]) => other !== id && keys.some((k) => same(k, hotkey)))?.[0];
+      if (id in hotkeys) continue;
+      if (takenBy) lines.push(`No hotkey for ${name}: ${label} is already used by ${takenBy}. Bind one under Settings, Hotkeys.`);
+      else {
+        hotkeys[id] = [hotkey];
+        changed = true;
+        lines.push(`Bound ${label} to ${name}.`);
+      }
+    }
+    if (changed) {
+      await vault.adapter.write(path, `${JSON.stringify(hotkeys, null, 2)}\n`);
+      lines.push("Reload Obsidian (command palette: Reload app without saving) to pick up the new hotkeys.");
+    }
+    return lines;
+  };
+
   // Libraries dropped into the folder load only when the plugin keeps its library in the vault.
   if (settings.libraryStorageMode !== "vault") {
     stop(
@@ -77,7 +117,7 @@ export async function installKit(ea: any, utils: any) {
   const haveCommands = Object.values(commands).every((name) => exists(`${scriptFolder}/${name}`));
   const haveLibraries = libraries.every((name) => exists(`${libraryFolder}/${name}`));
   if (installed === latest && haveLibraries && haveCommands) {
-    new Notice(`IEC Electronics Kit is up to date (v${latest}).`, 8000);
+    new Notice([`IEC Electronics Kit is up to date (v${latest}).`, ...(await bindHotkeys())].join("\n"), 8000);
     return;
   }
   say(installed ? `Updated the Kit from v${installed} to v${latest}.` : `Installed the Kit, v${latest}.`);
@@ -133,6 +173,6 @@ export async function installKit(ea: any, utils: any) {
     }
   }
 
-  say("Suggested hotkeys (Settings, Hotkeys): Ctrl/Cmd+R for Rotate 90 degrees, Alt+W for Square Wires.");
+  for (const line of await bindHotkeys()) say(line);
   new Notice(`IEC Electronics Kit\n${report.join("\n")}`, 20000);
 }

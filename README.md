@@ -51,7 +51,7 @@ An update never changes the Symbols already placed in your drawings, your own Te
 
 ## Hotkeys
 
-Obsidian has no public way for a script to bind hotkeys, so the installer only suggests them. Under Settings, Hotkeys, bind **Ctrl/Cmd+R** to Rotate 90 degrees and **Alt+W** to Square Wires. Rotate 90 degrees turns the selected Symbols exactly a quarter turn, keeping their Pins on the grid and their Wires attached.
+The installer binds **Ctrl/Cmd+R** to Rotate 90 degrees and **Alt+W** to Square Wires in Obsidian's `hotkeys.json`, so reload Obsidian once afterwards. It never replaces a hotkey you set for either Command, and it skips a key another command already uses (the notice says so). Obsidian has no public API for hotkeys, so this edits its own file; if you'd rather bind them yourself, do so under Settings, Hotkeys. Rotate 90 degrees turns the selected Symbols exactly a quarter turn, keeping their Pins on the grid and their Wires attached.
 
 ## How to wire
 
