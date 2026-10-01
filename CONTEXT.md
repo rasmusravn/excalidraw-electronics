@@ -45,6 +45,18 @@ The two tiers of the Component list. Core Components are in the first full Libra
 **Library**:
 The importable Excalidraw library file containing every Symbol as a library item.
 
+**Template**:
+The drawing new diagrams start from: no elements, only settings (grid on, the arrow tool drawing Wires).
+_Avoid_: preset, starter
+
+**Commands**:
+The Obsidian Excalidraw scripts that ship with the Library: Rotate 90 degrees and Square Wires.
+_Avoid_: macros, plugins
+
+**Kit**:
+Everything a user installs: the two Library files, the Template and the Commands.
+_Avoid_: bundle, package, extras
+
 **Generator**:
 The code that produces the Library from Symbol definitions. Symbols are never hand-drawn into the Library.
 
@@ -57,4 +69,5 @@ A small subset of Symbols, generated and imported into Excalidraw, that shows th
 - A **Symbol** has one or more **Pins**; each **Pin** may carry a **Pin target**
 - A **Wire** joins two **Pins**; Wires that join meet at a **Junction**
 - The **Generator** produces the **Library** from all **Symbols**
+- The **Kit** is the **Library**, the **Template** and the **Commands**; the Library alone also works outside Obsidian
 - The **Proof** is a subset of the **Library**, produced by the same **Generator**
