@@ -8,7 +8,7 @@
 import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
-import { SOURCE, build } from "./build.ts";
+import { TEMPLATE_MARKER, build } from "./build.ts";
 import { definitions } from "./definitions.ts";
 
 const out = "out";
@@ -41,7 +41,7 @@ if (process.argv.includes("--install")) {
   for (const [name, { installTo }] of Object.entries(files)) {
     const target = join(vault, installTo);
     // Never replace a template the user made themselves.
-    if (name.endsWith(".md") && existsSync(target) && !readFileSync(target, "utf8").includes(SOURCE)) {
+    if (name.endsWith(".md") && existsSync(target) && !readFileSync(target, "utf8").includes(`${TEMPLATE_MARKER}:`)) {
       console.log(`skipped ${target}: an existing template not made by this Generator`);
       continue;
     }

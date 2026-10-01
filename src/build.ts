@@ -41,7 +41,7 @@ export type Drawing = {
   files: Record<string, never>;
 };
 
-export const SOURCE = "https://github.com/rasmusravn/excalidraw-electronics";
+const SOURCE = "https://github.com/rasmusravn/excalidraw-electronics";
 const CREATED = Date.UTC(2026, 9, 1);
 
 const digest = (key: string) => createHash("sha1").update(key).digest();
@@ -145,6 +145,10 @@ const buildCatalog = (items: LibraryItem[]): Drawing => {
   };
 };
 
+// Frontmatter key that marks a template as the Generator's. The plugin compresses the drawing
+// when it saves the file, but keeps the frontmatter readable.
+export const TEMPLATE_MARKER = "excalidraw-electronics-template";
+
 // The drawing new Obsidian Excalidraw drawings start from: no elements, only settings. The grid
 // is on, and the arrow tool draws Wires: elbow arrows without arrowheads.
 const buildTemplate = () => {
@@ -174,6 +178,7 @@ const buildTemplate = () => {
     "",
     "excalidraw-plugin: parsed",
     "tags: [excalidraw]",
+    `${TEMPLATE_MARKER}: true`,
     "",
     "---",
     "==⚠  Switch to EXCALIDRAW VIEW in the MORE OPTIONS menu of this document. ⚠==",

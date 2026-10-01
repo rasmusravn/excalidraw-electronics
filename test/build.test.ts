@@ -37,5 +37,7 @@ test("build throws when a Symbol puts a Pin off the 20px grid", () => {
 test("the template is an Obsidian Excalidraw drawing the plugin can start from", () => {
   const { template } = build(definitions);
   assert.match(template, /^---\n\nexcalidraw-plugin: parsed\n/);
+  // Marks it as the Generator's, readable even after the plugin compresses the drawing.
+  assert.match(template, /\nexcalidraw-electronics-template: true\n[\s\S]*\n---\n/);
   assert.match(template, /## Drawing\n```json\n[\s\S]*\n```\n%%\n$/);
 });
