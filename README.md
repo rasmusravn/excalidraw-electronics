@@ -10,18 +10,48 @@ An Excalidraw library of IEC 60617 electronic schematic symbols and RF block sym
 
 ## Install
 
-Download the files from the latest [release](https://github.com/rasmusravn/excalidraw-electronics/releases/latest).
+Every file below is on the latest [release](https://github.com/rasmusravn/excalidraw-electronics/releases/latest). Pick the section that fits you.
 
-**Drop into the vault (recommended).** Needs the Obsidian Excalidraw plugin 2.28.1 or later, with its library stored in the vault (plugin settings, library storage). Put both `.excalidrawlib` files into the vault's `Excalidraw/Libraries/` folder. The plugin loads them by itself, and replacing them with a newer release updates the items in place.
+### Obsidian, with the installer (recommended)
 
-**Import through the library menu.** In any Excalidraw drawing, open the library panel, then its menu, then *Open*, and pick each `.excalidrawlib` file. This works without vault library storage, and in plain Excalidraw too.
+Needs the Obsidian Excalidraw plugin 2.28.1 or later, with its library stored in the vault (Settings, Excalidraw, library storage). Takes about two minutes, with no terminal and no unzipping.
+
+1. Download `Install-IEC-Electronics-Kit.md` from the release and save it in your vault's script folder (`Excalidraw/Scripts` unless you changed it) as `Install IEC Electronics Kit.md`.
+2. Open any Excalidraw drawing, open the command palette and run **Install IEC Electronics Kit**.
+
+It downloads the latest release and puts the whole Kit in place:
+
+- both `.excalidrawlib` files in the plugin's library folder, which the plugin loads by itself
+- the two Commands, **Rotate 90 degrees** and **Square Wires**, in the script folder
+- the Template at `Excalidraw/Template.excalidraw.md`, so new drawings start with the 20px grid on and the arrow tool drawing Wires, only if you don't already have a Template there. If you do, it leaves yours alone and offers to save ours beside it.
+
+It never replaces a Template or script you made yourself.
+
+### Obsidian, by hand
+
+Put both `.excalidrawlib` files into the vault's `Excalidraw/Libraries/` folder. The plugin loads them by itself, and replacing them with a newer release updates the items in place.
+
+Optionally also:
+
+- `Template.excalidraw.md` at `Excalidraw/Template.excalidraw.md`, the plugin's default template path
+- `Rotate-90-degrees.md` and `Square-Wires.md` in the plugin's script folder, renamed to `Rotate 90 degrees.md` and `Square Wires.md`. Each becomes a command.
 
 If the vault syncs with Obsidian Sync, turn on *Sync all other types* under Settings, Sync, on every device: `.excalidrawlib` and `.excalidraw` files are skipped otherwise.
 
-**Optional extras**, individual files on the release:
+### Plain Excalidraw
 
-- `Template.excalidraw.md`: put it at `Excalidraw/Template.excalidraw.md`, the plugin's default template path. New drawings then start with the 20px grid on and the arrow tool drawing Wires: elbow arrows with no arrowheads.
-- `Rotate-90-degrees.md` and `Square-Wires.md`: put them in the plugin's script folder (default `Excalidraw/Scripts`) as `Rotate 90 degrees.md` and `Square Wires.md`. Each becomes a command; bind Ctrl/Cmd+R to Rotate 90 degrees and Alt+W to Square Wires under Settings, Hotkeys. Rotate 90 degrees turns the selected Symbols exactly a quarter turn, keeping their Pins on the grid and their Wires attached.
+In any Excalidraw drawing, open the library panel, then its menu, then *Open*, and pick each `.excalidrawlib` file. The Symbols work there, but the Commands and the Template are Obsidian-only. Library imports through the menu don't update in place, so remove the old items before importing a newer release.
+
+## Update
+
+- **With the installer:** run **Install IEC Electronics Kit** again. It tells you which version you have and which is the latest, and replaces only the files it made. On the latest version it says so and changes nothing.
+- **By hand:** overwrite the Library files in `Excalidraw/Libraries/` with the ones from the newer release.
+
+An update never changes the Symbols already placed in your drawings, your own Template, your own scripts or your drawings. Item ids stay the same across versions, so the library panel gets no duplicates. Nothing checks for updates in the background.
+
+## Hotkeys
+
+Obsidian has no public way for a script to bind hotkeys, so the installer only suggests them. Under Settings, Hotkeys, bind **Ctrl/Cmd+R** to Rotate 90 degrees and **Alt+W** to Square Wires. Rotate 90 degrees turns the selected Symbols exactly a quarter turn, keeping their Pins on the grid and their Wires attached.
 
 ## How to wire
 
