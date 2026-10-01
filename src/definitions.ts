@@ -71,6 +71,7 @@ import {
   splitter,
   termination,
 } from "./symbols/routing.ts";
+import { diplexer, hybrid180, hybrid90, iqDemodulator, iqModulator } from "./symbols/iq.ts";
 
 export const definitions: SymbolDefinition[] = [
   resistor,
@@ -134,6 +135,8 @@ export const definitions: SymbolDefinition[] = [
   oscillator,
   vco,
   pll,
+  iqModulator,
+  iqDemodulator,
   lowPassFilter,
   highPassFilter,
   bandPassFilter,
@@ -144,6 +147,9 @@ export const definitions: SymbolDefinition[] = [
   coupler,
   circulator,
   isolator,
+  hybrid90,
+  hybrid180,
+  diplexer,
   antenna,
   rfSwitchSpdt,
   rfSwitchSp4t,

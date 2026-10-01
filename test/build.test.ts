@@ -200,7 +200,7 @@ test("the Core gain, frequency and filtering blocks are in the RF-blocks Library
     "Amplifier", "Variable-gain amplifier", "Mixer", "Oscillator", "VCO", "PLL synthesizer",
     "Low-pass filter", "High-pass filter", "Band-pass filter", "Band-stop filter", "Attenuator", "Variable attenuator",
   ];
-  assert.deepEqual(names.slice(0, family.length), family);
+  assert.deepEqual(coreFrom(names, "Amplifier", family.length), family);
   assert.equal(names.at(-1), "RF port");
 });
 
@@ -214,9 +214,9 @@ test("the four filters differ in their wave marks alone", () => {
   assert.equal(new Set(marks).size, 4);
 });
 
-test("the whole RF-blocks Library is in the spec's order", () => {
+test("the whole Core RF-blocks Library is in the spec's order", () => {
   const names = build(definitions).rfBlocks.libraryItems.map((item) => item.name);
-  assert.deepEqual(names, [
+  assert.deepEqual(coreFrom(names, "Amplifier", names.length), [
     "Amplifier", "Variable-gain amplifier", "Mixer", "Oscillator", "VCO", "PLL synthesizer",
     "Low-pass filter", "High-pass filter", "Band-pass filter", "Band-stop filter", "Attenuator", "Variable attenuator",
     "2-way splitter/combiner", "Directional coupler", "Circulator", "Isolator",
@@ -247,6 +247,19 @@ test("the Later electromechanical parts and transducers sit in their families, t
   const start = names.indexOf("Fuse (ANSI)") + 1;
   assert.deepEqual(names.slice(start, start + 4), ["Speaker", "Microphone", "Lamp", "Motor"]);
   for (const name of ["Thermistor", "Relay", "Speaker", "Microphone", "Lamp", "Motor"]) {
+    assert.equal(definitions.find((d) => d.name === name)?.tier, "Later", name);
+  }
+});
+
+test("the Later I/Q and hybrid blocks sit in their families, tagged Later", () => {
+  const names = build(definitions).rfBlocks.libraryItems.map((item) => item.name);
+  const after = (anchor: string, family: string[]) => {
+    const start = names.indexOf(anchor) + 1;
+    assert.deepEqual(names.slice(start, start + family.length), family);
+  };
+  after("PLL synthesizer", ["I/Q modulator", "I/Q demodulator"]);
+  after("Isolator", ["90° hybrid", "180° hybrid", "Diplexer/duplexer"]);
+  for (const name of ["I/Q modulator", "I/Q demodulator", "90° hybrid", "180° hybrid", "Diplexer/duplexer"]) {
     assert.equal(definitions.find((d) => d.name === name)?.tier, "Later", name);
   }
 });
