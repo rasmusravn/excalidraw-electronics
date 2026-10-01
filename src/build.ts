@@ -74,9 +74,28 @@ const toElements = (shapes: Shape[], key: string, groupIds: string[]): Element[]
       seed: h.readUInt32BE(10) >>> 1,
       version: 1,
       versionNonce: h.readUInt32BE(14) >>> 1,
-      groupIds,
+      // A shape may sit in inner groups of its own; Excalidraw lists the innermost first.
+      groupIds: [...((shape.groupIds as string[] | undefined) ?? []), ...groupIds],
     };
   });
+
+// The rules a Symbol must follow to survive Excalidraw's import and placement.
+const check = (name: string, elements: Element[]) => {
+  const fail = (problem: string) => {
+    throw new Error(`${name}: ${problem}`);
+  };
+  const members = new Map<string, number>();
+  for (const e of elements) {
+    if (typeof e.roughness !== "number") fail(`element without an explicit roughness (${e.type})`);
+    // Obsidian reads fontFamily 4 as each user's own local font.
+    if (e.fontFamily === 4) fail(`fontFamily 4 on text "${e.text}"`);
+    // Excalidraw drops zero-size text when an item is placed.
+    if (e.type === "text" && !(e.width > 0 && e.height > 0)) fail(`zero-size text "${e.text}"`);
+    for (const g of e.groupIds) members.set(g, (members.get(g) ?? 0) + 1);
+  }
+  // The plugin's fork strips a group with one member.
+  for (const [g, n] of members) if (n < 2) fail(`group ${g} has only ${n} member`);
+};
 
 const itemName = (def: SymbolDefinition) => (def.variant === "ANSI" ? `${def.name} (ANSI)` : def.name);
 
@@ -103,13 +122,9 @@ const buildItem = (def: SymbolDefinition): LibraryItem => {
   const anchors = [gridAnchor(ax, ay), gridAnchor(bx - 1, by)];
   const normalised = [...anchors, ...shapes].map((s) => ({ ...s, x: s.x - ax, y: s.y - ay }));
   const key = `${def.name}:${def.variant}`;
-  return {
-    id: hashId(`${key}:item`),
-    status: "published",
-    created: CREATED,
-    name,
-    elements: toElements(normalised, key, [hashId(`${key}:group`)]),
-  };
+  const elements = toElements(normalised, key, [hashId(`${key}:group`)]);
+  check(name, elements);
+  return { id: hashId(`${key}:item`), status: "published", created: CREATED, name, elements };
 };
 
 const library = (libraryItems: LibraryItem[]): Library => ({
@@ -128,7 +143,7 @@ const buildCatalog = (items: LibraryItem[]): Drawing => {
   for (const item of items) {
     const group = [hashId(`catalog:${item.id}:group`)];
     for (const e of item.elements) {
-      shapes.push({ shape: { ...e, x: e.x + x, y: e.y }, key: `catalog:${e.id}`, groupIds: group });
+      shapes.push({ shape: { ...e, x: e.x + x, y: e.y, groupIds: e.groupIds.slice(0, -1) }, key: `catalog:${e.id}`, groupIds: group });
     }
     shapes.push({ shape: { ...text(x, captionY, item.name), strokeColor: "#868e96" }, key: `catalog:${item.id}:name`, groupIds: [] });
     x += floorToGrid(bounds(item.elements).maxX) + 4 * GRID;
@@ -206,6 +221,13 @@ const buildRotateScript = () =>
 
 export function build(definitions: SymbolDefinition[]) {
   const items = definitions.map((def) => ({ def, item: buildItem(def) }));
+  const ids = new Set<string>();
+  for (const { item } of items) {
+    for (const e of item.elements) {
+      if (ids.has(e.id)) throw new Error(`${item.name}: duplicate element id ${e.id}`);
+      ids.add(e.id);
+    }
+  }
   const ofKind = (kind: SymbolDefinition["kind"]) => items.filter(({ def }) => def.kind === kind).map(({ item }) => item);
   const schematic = ofKind("Schematic");
   const rfBlocks = ofKind("Block");
