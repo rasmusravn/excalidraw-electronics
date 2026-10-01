@@ -43,12 +43,13 @@ export const mixer = block(
 const leads = [line([0, 0], [20, 0]), line([60, 0], [80, 0])];
 const box = rect(20, -20, 40, 40);
 const throughPins = [pin(0, 0, RIGHT), pin(80, 0, LEFT)];
-// A diagonal arrow across a body: the IEC mark for "variable".
-const variable = [line([22, 18], [58, -18]), arrowhead([22, 18], [58, -18], 1, 6)];
+// A diagonal arrow through a body, crossing its outline at both ends: the IEC mark for "variable".
+const arrowThrough = (from: Point, to: Point) => [line(from, to), arrowhead(from, to, 1, 6)];
+const variable = arrowThrough([12, 18], [68, -24]);
 
 // A triangle; the label goes below it.
 const triangle = polygon([[20, -20], [60, 0], [20, 20]]);
-export const vga = block("Variable-gain amplifier", [...leads, triangle, ...variable, text(40, 24, "VGA", "center")], throughPins);
+export const vga = block("Variable-gain amplifier", [...leads, triangle, ...arrowThrough([16, 26], [60, -18]), text(40, 24, "VGA", "center")], throughPins);
 
 // IEC wave marks: three sines for high, middle and low frequencies, top to bottom. Struck
 // through: the bands the filter stops. The label goes inside, under the marks.
@@ -79,13 +80,11 @@ export const oscillator = block(
   [box, generatorWave, line([60, 0], [80, 0]), text(40, 4.8, "OSC", "center")],
   [pin(80, 0, LEFT)],
 );
-// A label above a box whose inside is taken by an arrow.
-const labelAbove = (label: string) => text(40, -24 - LINE_HEIGHT, label, "center");
-
-// Tuned by a control voltage from below, Pin at (40,40). The arrow fills the box, so the label goes above.
+// Tuned by a control voltage from below, Pin at (40,40). The sine sits up-left, clear of the
+// arrow; the label goes below, beside the control lead.
 export const vco = block(
   "VCO",
-  [box, sine(30, 0, 20, 4), ...variable, line([60, 0], [80, 0]), line([40, 20], [40, 40]), labelAbove("VCO")],
+  [box, sine(24, -10, 16, 3), ...variable, line([60, 0], [80, 0]), line([40, 20], [40, 40]), text(44, 24, "VCO")],
   [pin(80, 0, LEFT), pin(40, 40, UP)],
 );
 // Reference in on the left, output on the right.
@@ -93,7 +92,7 @@ export const pll = block("PLL synthesizer", [...leads, box, text(40, -8.4, "PLL"
 
 // A box marked in dB.
 export const attenuator = block("Attenuator", [...leads, box, text(40, -8.4, "dB", "center")], throughPins);
-export const variableAttenuator = block("Variable attenuator", [...leads, box, ...variable, labelAbove("dB")], throughPins);
+export const variableAttenuator = block("Variable attenuator", [...leads, box, ...variable, text(40, 24, "dB", "center")], throughPins);
 
 // A mast with an open triangle on top; the Pin is at the foot.
 export const antenna = block(
