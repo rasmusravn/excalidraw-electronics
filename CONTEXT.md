@@ -32,6 +32,10 @@ An invisible element at a Pin that a Wire end can attach to, so the Wire follows
 A connection drawn between Pins. Only Wires drawn with the arrow tool (no arrowheads) attach to Pin targets.
 _Avoid_: net, trace, connection
 
+**Junction**:
+A point where Wires join, marked by a filled dot, with a Pin on each leg (four, or three for a T). Wires can't attach to other Wires, so joining Wires each attach to a Junction leg.
+_Avoid_: node, net tie
+
 **Pin stub**:
 A standalone library item made of a lead and its Pin target. The user places copies along a generic IC box, so one box serves any pin count.
 
@@ -51,6 +55,6 @@ A small subset of Symbols, generated and imported into Excalidraw, that shows th
 
 - A **Component** has one or more **Symbols**, one per **Variant**
 - A **Symbol** has one or more **Pins**; each **Pin** may carry a **Pin target**
-- A **Wire** joins two **Pins**
+- A **Wire** joins two **Pins**; Wires that join meet at a **Junction**
 - The **Generator** produces the **Library** from all **Symbols**
 - The **Proof** is a subset of the **Library**, produced by the same **Generator**
