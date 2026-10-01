@@ -57,3 +57,13 @@ Copy `.env.example` to `.env` and set `VAULT`. `install-vault` copies the Librar
 ## Licence
 
 The code and the Symbols are MIT licensed (see `LICENSE`). The Cascadia Code font in `fonts/` is Microsoft's, under the SIL Open Font License 1.1 (see `fonts/OFL.txt`); the released Library files contain no font data.
+
+### Releasing
+
+A release is one tag push. Set `version` in `package.json`, commit, then:
+
+```sh
+git tag v1.2.0 && git push origin main v1.2.0
+```
+
+The workflow in `.github/workflows/release.yml` checks that the tag matches `package.json`'s version, runs `npm ci` and `npm test`, builds from a clean `out/` and creates the release with exactly the Kit's seven files: the two Libraries, the catalog, the Template, the two Commands and the installer.
