@@ -19,7 +19,7 @@ const { version } = JSON.parse(readFileSync(new URL("../package.json", import.me
 const { files: releaseFiles, scripts } = build(definitions, { version });
 const install = process.argv.includes("--install");
 type Hotkey = { modifiers: string[]; key: string };
-const HOTKEYS: Record<keyof typeof scripts, Hotkey> = {
+const HOTKEYS: Record<string, Hotkey> = {
   "Rotate 90 degrees": { modifiers: ["Mod"], key: "R" },
   "Square Wires": { modifiers: ["Alt"], key: "W" },
 };

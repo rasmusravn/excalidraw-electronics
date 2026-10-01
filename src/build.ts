@@ -3,6 +3,7 @@
 import { createHash } from "node:crypto";
 import { FONT, GRID, INK, STROKE, bounds, ceilToGrid, floorToGrid, gridAnchor, pinShapes, text } from "./primitives.ts";
 import type { Pin, Shape } from "./primitives.ts";
+import { installKit } from "./installer.ts";
 import { rotateSelectionQuarterTurn } from "./rotate.ts";
 import { squareWires } from "./square-wires.ts";
 
@@ -246,8 +247,8 @@ const buildTemplate = (version: string) => {
 export const SCRIPT_MARKER = "// excalidraw-electronics script";
 
 // A script ships its function's source text, so the tests run exactly what is installed.
-const script = (fn: (ea: unknown) => Promise<void>, version: string) =>
-  [SCRIPT_MARKER, `// version ${version}`, fn.toString(), `await ${fn.name}(ea);`, ""].join("\n");
+const script = (fn: (ea: any, utils: any) => Promise<void>, version: string) =>
+  [SCRIPT_MARKER, `// version ${version}`, fn.toString(), `await ${fn.name}(ea, utils);`, ""].join("\n");
 
 const json = (value: unknown) => `${JSON.stringify(value, null, 2)}\n`;
 
@@ -271,6 +272,7 @@ export function build(definitions: SymbolDefinition[], { version = "0.0.0" }: { 
   const scripts = {
     "Rotate 90 degrees": script(rotateSelectionQuarterTurn, version),
     "Square Wires": script(squareWires, version),
+    "Install IEC Electronics Kit": script(installKit, version),
   };
   return {
     schematic: schematicLibrary,
@@ -286,6 +288,7 @@ export function build(definitions: SymbolDefinition[], { version = "0.0.0" }: { 
       "Template.excalidraw.md": template,
       "Rotate-90-degrees.md": scripts["Rotate 90 degrees"],
       "Square-Wires.md": scripts["Square Wires"],
+      "Install-IEC-Electronics-Kit.md": scripts["Install IEC Electronics Kit"],
     } as Record<string, string>,
   };
 }

@@ -33,6 +33,7 @@ test("the version is in the catalog's how-to-wire note", () => {
 test("the release files are individual and space-free, with the Commands under release names", () => {
   const names = Object.keys(kit().files).sort();
   assert.deepEqual(names, [
+    "Install-IEC-Electronics-Kit.md",
     "Rotate-90-degrees.md",
     "Square-Wires.md",
     "Template.excalidraw.md",
