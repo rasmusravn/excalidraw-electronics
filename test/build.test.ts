@@ -166,3 +166,10 @@ test("Pins have no visible dot: nothing visible sits only at a Pin end", () => {
     }
   }
 });
+
+test("the Core transistors and amplifiers follow the NPN in the spec's order", () => {
+  const names = build(definitions).schematic.libraryItems.map((item) => item.name);
+  const active = ["NPN transistor", "PNP transistor", "N-MOSFET", "P-MOSFET", "N-JFET", "Op-amp", "Comparator"];
+  const start = names.indexOf("NPN transistor");
+  assert.deepEqual(names.slice(start, start + active.length), active);
+});

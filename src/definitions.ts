@@ -17,7 +17,7 @@ import {
   variableCapacitor,
 } from "./symbols/passives.ts";
 import { led, photodiode, plainDiode, schottky, varactor, zener } from "./symbols/diodes.ts";
-import { npn } from "./symbols/transistors.ts";
+import { comparator, nJfet, nMosfet, npn, opAmp, pMosfet, pnp } from "./symbols/transistors.ts";
 import { signalGround } from "./symbols/grounds.ts";
 import { icBox, junctionDot, junctionT, pinStub } from "./symbols/ic.ts";
 import { amplifier, antenna, bandPassFilter, mixer, rfPort } from "./symbols/blocks.ts";
@@ -42,6 +42,12 @@ export const definitions: SymbolDefinition[] = [
   varactor,
   photodiode,
   npn,
+  pnp,
+  nMosfet,
+  pMosfet,
+  nJfet,
+  opAmp,
+  comparator,
   signalGround,
   fuse,
   fuseAnsi,
