@@ -13,14 +13,16 @@ const below = (label: string) => text(40, 24, label, "center");
 
 // --- Filter variants ---
 
-// The band-pass marks with the variable arrow through the box; the label goes below, clear of it.
+// The band-pass marks, smaller and up-left, clear of the variable arrow through the box, so no
+// stroke of the arrow reads as a strike. The label goes below.
 export const tunableBandPassFilter = later("Tunable band-pass filter", [
-  ...[-12.8, -7.2, -1.6].flatMap((y, i) => [sine(30, y, 20, 2.4), ...(i === 1 ? [] : [line([37, y + 5.3], [43, y - 5.3])])]),
+  ...[-16, -11.5, -7].flatMap((y, i) => [sine(23, y, 14, 1.8), ...(i === 1 ? [] : [line([28, y + 4], [32, y - 4])])]),
   ...variable,
   text(40, 24, "BPF", "center"),
 ]);
 
-// A flat response with one narrow dip; the label is wider than the box, so it goes below.
+// IEC 60617 has no notch mark, and three waves with the middle struck would be the band-stop
+// filter, so this one shows its response: flat with one narrow dip. The label goes below.
 export const notchFilter = later("Notch filter", [line([26, -4], [36, -4], [40, 8], [44, -4], [54, -4]), below("NOTCH")]);
 
 // Two interdigital transducers filling the box: combs of fingers from a top and a bottom bar, side
