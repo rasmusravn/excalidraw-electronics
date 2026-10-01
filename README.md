@@ -4,7 +4,7 @@ An Excalidraw library of IEC 60617 electronic schematic symbols and RF block sym
 
 ![A superheterodyne receiver chain drawn from the Library: antenna, band-pass filter, LNA, mixer with a local oscillator, IF band-pass filter, variable-gain amplifier and ADC](docs/images/receiver.png)
 
-*Drawn from the Library's own Symbols on the project's Template settings, with elbow Wires bound to the Pins. Open [`docs/images/receiver.excalidraw`](docs/images/receiver.excalidraw) in Excalidraw to edit it; `npm run readme-image` rebuilds it.*
+*Drawn from the Library's own Symbols on the project's Template settings (20px grid on), with elbow Wires bound to the Pins. Open [`docs/images/receiver.excalidraw`](docs/images/receiver.excalidraw) in Excalidraw to edit it; `npm run readme-image` rebuilds it.*
 
 ## What's in it
 

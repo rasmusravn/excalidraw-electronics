@@ -91,15 +91,29 @@ writeFileSync(`${out}/receiver.excalidraw`, `${JSON.stringify({ type: "excalidra
 
 const svg: SVGElement = await (L as any).exportToSvg({ elements: scene, appState, files: null, exportPadding: 30, skipInliningFonts: true });
 const fontFile = readFileSync("fonts/Cascadia.woff2").toString("base64");
-const svgText = svg.outerHTML.replace(/font-family="[^"]*"/g, 'font-family="Cascadia Code, monospace"');
+// Excalidraw's export leaves the grid out, so draw the template's own: lines every 20px on scene
+// coordinates (where the Pins sit), every fifth one stronger, behind everything else.
+const [minX, minY] = L.getCommonBounds(scene);
+const [offsetX, offsetY] = [30 - minX, 30 - minY];
+const [width, height] = [Number(svg.getAttribute("width")), Number(svg.getAttribute("height"))];
+const grid = (to: number, offset: number, vertical: boolean) => {
+  const lines: string[] = [];
+  for (let at = offset % 20, k = Math.round((at - offset) / 20); at <= to; at += 20, k++) {
+    const colour = k % template.appState.gridStep === 0 ? "#d8dce0" : "#eceef0";
+    lines.push(vertical ? `<line x1="${at}" y1="0" x2="${at}" y2="${height}" stroke="${colour}"/>` : `<line x1="0" y1="${at}" x2="${width}" y2="${at}" stroke="${colour}"/>`);
+  }
+  return lines.join("");
+};
+const gridSvg = `<g stroke-width="1" shape-rendering="crispEdges">${grid(width, offsetX, true)}${grid(height, offsetY, false)}</g>`;
+const svgText = svg.outerHTML
+  .replace(/font-family="[^"]*"/g, 'font-family="Cascadia Code, monospace"')
+  .replace(/(<rect x="0" y="0"[^>]*><\/rect>)/, `$1${gridSvg}`);
 writeFileSync(`${out}/receiver.svg`, svgText);
 
 // PNG through headless Chromium, with the font the Symbols use.
 const html = `<!doctype html><style>@font-face{font-family:"Cascadia Code";src:url(data:font/woff2;base64,${fontFile})}body{margin:0;background:#fff}svg{display:block}</style>${svgText}`;
 const page = `${out}/.receiver.html`;
 writeFileSync(page, html);
-const width = Number(svg.getAttribute("width"));
-const height = Number(svg.getAttribute("height"));
 try {
   execFileSync("chromium", ["--headless", "--disable-gpu", "--force-device-scale-factor=2", `--window-size=${width},${height}`, `--screenshot=${out}/receiver.png`, `file://${process.cwd()}/${page}`], { stdio: "ignore" });
 } finally {
