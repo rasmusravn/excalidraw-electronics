@@ -88,3 +88,12 @@ test("the Proof's Schematic symbols are in the schematic Library, each ANSI Vari
   }
   assert.equal(names.indexOf("Resistor (ANSI)"), names.indexOf("Resistor") + 1);
 });
+
+test("the Proof's Block symbols are in the RF-blocks Library and the catalog", () => {
+  const { rfBlocks, schematic, catalog } = build(definitions);
+  const names = rfBlocks.libraryItems.map((item) => item.name);
+  assert.deepEqual(names, ["Amplifier", "Mixer", "Band-pass filter", "Antenna", "RF port"]);
+  assert.ok(schematic.libraryItems.every((item) => !names.includes(item.name)));
+  const captions = catalog.elements.filter((e) => e.type === "text").map((e) => e.text);
+  for (const name of names) assert.ok(captions.includes(name), name);
+});

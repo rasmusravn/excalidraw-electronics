@@ -3,5 +3,17 @@ import type { SymbolDefinition } from "./build.ts";
 import { capacitor, resistor, resistorAnsi } from "./symbols/passives.ts";
 import { npn } from "./symbols/transistors.ts";
 import { signalGround } from "./symbols/grounds.ts";
+import { amplifier, antenna, bandPassFilter, mixer, rfPort } from "./symbols/blocks.ts";
 
-export const definitions: SymbolDefinition[] = [resistor, resistorAnsi, capacitor, npn, signalGround];
+export const definitions: SymbolDefinition[] = [
+  resistor,
+  resistorAnsi,
+  capacitor,
+  npn,
+  signalGround,
+  amplifier,
+  mixer,
+  bandPassFilter,
+  antenna,
+  rfPort,
+];

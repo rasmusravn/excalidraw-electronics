@@ -134,19 +134,25 @@ const library = (libraryItems: LibraryItem[]): Library => ({
   libraryItems,
 });
 
-// Every item laid out in a row with its name underneath, on the grid.
-const buildCatalog = (items: LibraryItem[]): Drawing => {
+// One row per Library, every item with its name underneath, all on the grid.
+const buildCatalog = (rows: LibraryItem[][]): Drawing => {
   const shapes: { shape: Shape; key: string; groupIds: string[] }[] = [];
-  const height = Math.max(0, ...items.map((item) => bounds(item.elements).maxY));
-  const captionY = floorToGrid(height) + 2 * GRID;
-  let x = 0;
-  for (const item of items) {
-    const group = [hashId(`catalog:${item.id}:group`)];
-    for (const e of item.elements) {
-      shapes.push({ shape: { ...e, x: e.x + x, y: e.y, groupIds: e.groupIds.slice(0, -1) }, key: `catalog:${e.id}`, groupIds: group });
+  let top = 0;
+  for (const items of rows.filter((row) => row.length > 0)) {
+    const height = Math.max(...items.map((item) => bounds(item.elements).maxY));
+    const captionY = top + floorToGrid(height) + 2 * GRID;
+    let x = 0;
+    for (const item of items) {
+      const group = [hashId(`catalog:${item.id}:group`)];
+      for (const e of item.elements) {
+        const shape = { ...e, x: e.x + x, y: e.y + top, groupIds: e.groupIds.slice(0, -1) };
+        shapes.push({ shape, key: `catalog:${e.id}`, groupIds: group });
+      }
+      const caption = { ...text(x, captionY, item.name), strokeColor: "#868e96" };
+      shapes.push({ shape: caption, key: `catalog:${item.id}:name`, groupIds: [] });
+      x += floorToGrid(bounds(item.elements).maxX) + 4 * GRID;
     }
-    shapes.push({ shape: { ...text(x, captionY, item.name), strokeColor: "#868e96" }, key: `catalog:${item.id}:name`, groupIds: [] });
-    x += floorToGrid(bounds(item.elements).maxX) + 4 * GRID;
+    top = captionY + 4 * GRID;
   }
   return {
     type: "excalidraw",
@@ -234,7 +240,7 @@ export function build(definitions: SymbolDefinition[]) {
   return {
     schematic: library(schematic),
     rfBlocks: library(rfBlocks),
-    catalog: buildCatalog([...schematic, ...rfBlocks]),
+    catalog: buildCatalog([schematic, rfBlocks]),
     template: buildTemplate(),
     rotateScript: buildRotateScript(),
   };
