@@ -1,5 +1,6 @@
 // Usage: node src/cli.ts [--sketchy] [--install]
-// --sketchy also writes hand-drawn copies of both Libraries.
+// --sketchy also writes hand-drawn copies of both Libraries; --install keeps them up to date once
+// they are in the vault.
 // Writes the Libraries, the catalog and the drawing template to out/. --install also copies them
 // into the Obsidian vault named by VAULT in .env:
 // - the Libraries into Excalidraw/Libraries/, where the Excalidraw plugin loads them
@@ -16,7 +17,13 @@ import { definitions } from "./definitions.ts";
 
 const out = "out";
 const { schematic, rfBlocks, catalog, template, rotateScript } = build(definitions);
-const sketchy = process.argv.includes("--sketchy") ? build(definitions, { sketchy: true }) : undefined;
+const install = process.argv.includes("--install");
+// Once the sketchy Libraries are in the vault, every install keeps them up to date.
+const sketchyInstalled = () => {
+  const vault = vaultPath();
+  return !!vault && existsSync(join(vault, "Excalidraw/Libraries/electronics-schematic-sketchy.excalidrawlib"));
+};
+const sketchy = process.argv.includes("--sketchy") || (install && sketchyInstalled()) ? build(definitions, { sketchy: true }) : undefined;
 const ROTATE = "Rotate 90 degrees";
 // marker: a file the Generator manages, which it may replace only if it finds the marker in it.
 const files: Record<string, { content: string; installTo: string; marker?: string }> = {
@@ -78,7 +85,7 @@ for (const [name, { content }] of Object.entries(files)) {
 }
 console.log(`wrote ${Object.keys(files).map((name) => join(out, name)).join(", ")}`);
 
-if (process.argv.includes("--install")) {
+if (install) {
   const vault = vaultPath();
   if (!vault) throw new Error("--install needs VAULT in .env (see .env.example)");
   for (const [name, { installTo, marker }] of Object.entries(files)) {
