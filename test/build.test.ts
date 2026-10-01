@@ -298,7 +298,7 @@ test("the local oscillator follows the oscillator: a circle with a sine, its one
   const lo = definitions.find((d) => d.name === "Local oscillator")!;
   assert.equal(lo.pins.length, 1);
   const [p] = lo.pins;
-  const lowest = Math.min(...lo.shapes.flatMap((s) => [s.y, ...((s.points as number[][] | undefined) ?? []).map((q) => s.y + q[1])]));
-  assert.equal(p.y, lowest, "the Pin is the topmost point");
+  const topmost = Math.min(...lo.shapes.flatMap((s) => [s.y, ...((s.points as number[][] | undefined) ?? []).map((q) => s.y + q[1])]));
+  assert.equal(p.y, topmost, "the Pin is the topmost point");
   assert.deepEqual(p.dir, [0, 1], "its lead runs down from the Pin into the circle");
 });
