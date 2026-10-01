@@ -173,3 +173,19 @@ test("the Core transistors and amplifiers follow the NPN in the spec's order", (
   const start = names.indexOf("NPN transistor");
   assert.deepEqual(names.slice(start, start + active.length), active);
 });
+
+test("the Core sources, grounds, rail and switches follow the amplifiers in the spec's order", () => {
+  const names = build(definitions).schematic.libraryItems.map((item) => item.name);
+  const family = [
+    "Comparator", "DC voltage source", "Battery", "AC source", "Current source",
+    "Signal ground", "Chassis ground", "Earth ground", "Supply rail",
+    "SPST switch", "SPDT switch", "Push button", "Fuse", "Fuse (ANSI)",
+  ];
+  const start = names.indexOf("Comparator");
+  assert.deepEqual(names.slice(start, start + family.length), family);
+});
+
+test("the supply rail's label is editable text", () => {
+  const rail = build(definitions).schematic.libraryItems.find((i) => i.name === "Supply rail")!;
+  assert.ok(rail.elements.some((e) => e.type === "text" && e.text === "VCC"));
+});

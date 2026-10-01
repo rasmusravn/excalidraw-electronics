@@ -18,7 +18,9 @@ import {
 } from "./symbols/passives.ts";
 import { led, photodiode, plainDiode, schottky, varactor, zener } from "./symbols/diodes.ts";
 import { comparator, nJfet, nMosfet, npn, opAmp, pMosfet, pnp } from "./symbols/transistors.ts";
-import { signalGround } from "./symbols/grounds.ts";
+import { chassisGround, earthGround, signalGround, supplyRail } from "./symbols/grounds.ts";
+import { acSource, battery, currentSource, dcSource } from "./symbols/sources.ts";
+import { pushButton, spdt, spst } from "./symbols/switches.ts";
 import { icBox, junctionDot, junctionT, pinStub } from "./symbols/ic.ts";
 import { amplifier, antenna, bandPassFilter, mixer, rfPort } from "./symbols/blocks.ts";
 
@@ -48,7 +50,17 @@ export const definitions: SymbolDefinition[] = [
   nJfet,
   opAmp,
   comparator,
+  dcSource,
+  battery,
+  acSource,
+  currentSource,
   signalGround,
+  chassisGround,
+  earthGround,
+  supplyRail,
+  spst,
+  spdt,
+  pushButton,
   fuse,
   fuseAnsi,
   icBox,
