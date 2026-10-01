@@ -16,13 +16,14 @@ Copy `.env.example` to `.env` and set `VAULT`. The Library files go into the vau
 
 `--install` also writes `Excalidraw/Template.excalidraw.md`, the plugin's default template path, unless a template you made yourself is already there. Every new drawing then starts with the 20px grid on, and the arrow tool draws Wires: elbow arrows with no arrowheads.
 
-`--install` also adds a "Rotate 90 degrees" script to the plugin's script folder and binds it to Ctrl/Cmd+R, unless that hotkey is taken. It turns the selected Symbols exactly a quarter turn clockwise, keeps their Pins on the grid and re-routes the Wires attached to them. Reload Obsidian after the first install so it picks up the hotkey.
+`--install` also adds a "Square Wires" script on Alt+W (see How to wire), and a "Rotate 90 degrees" script to the plugin's script folder and binds it to Ctrl/Cmd+R, unless that hotkey is taken. It turns the selected Symbols exactly a quarter turn clockwise, keeps their Pins on the grid and re-routes the Wires attached to them. Reload Obsidian after the first install so it picks up the hotkey.
 
 ## How to wire
 
 - Draw Wires with the arrow tool set to **elbow**, with no arrowheads. Drawings started from the template already are.
 - Drag each Wire end to a Pin **along its lead**. It ends on the Pin dot, stays attached and stays at right angles when the Symbol moves.
 - Turn Symbols with **Ctrl/Cmd+R** (Rotate 90 degrees), not the rotate handle, so their Pins stay on the grid.
+- Elbow Wires always have rounded bends; Excalidraw draws them that way. **Alt+W** (Square Wires) turns the selected Wires, or all Wires when nothing is selected, into sharp arrows through the same points, with right-angle corners and their ends still on their Pins. Squared Wires don't re-route: moving a Symbol makes its segment diagonal. Press Alt+W again to turn them back into elbow Wires. Square them when the diagram is done.
 
 Limits:
 

@@ -1,9 +1,10 @@
 // Turns Symbol definitions into the two Libraries, the catalog, the drawing template and the
-// rotate script, and refuses to produce anything that would break in Excalidraw.
+// scripts, and refuses to produce anything that would break in Excalidraw.
 import { createHash } from "node:crypto";
 import { FONT, GRID, INK, STROKE, bounds, ceilToGrid, floorToGrid, gridAnchor, pinShapes, text } from "./primitives.ts";
 import type { Pin, Shape } from "./primitives.ts";
 import { rotateSelectionQuarterTurn } from "./rotate.ts";
+import { squareWires } from "./square-wires.ts";
 
 export type SymbolDefinition = {
   name: string;
@@ -141,6 +142,8 @@ const HOW_TO_WIRE = `How to wire
 - Drag each Wire end to a Pin along its lead. It ends on the Pin dot,
   stays attached and stays at right angles when the Symbol moves.
 - Turn Symbols with Ctrl/Cmd+R (Rotate 90 degrees), not the rotate handle.
+- Elbow Wires always have rounded bends. Alt+W (Square Wires) makes them sharp right angles;
+  run it again to turn them back into elbow Wires, which re-route after moves.
 
 Limits
 - Approaching a Pin from the side leaves the Wire end about 10px off.
@@ -238,8 +241,8 @@ const buildTemplate = () => {
 // Marks the scripts the Generator installs, so --install never replaces a script of the user's.
 export const SCRIPT_MARKER = "// excalidraw-electronics script";
 
-const buildRotateScript = () =>
-  [SCRIPT_MARKER, rotateSelectionQuarterTurn.toString(), `await ${rotateSelectionQuarterTurn.name}(ea);`, ""].join("\n");
+// A script ships its function's source text, so the tests run exactly what is installed.
+const script = (fn: (ea: unknown) => Promise<void>) => [SCRIPT_MARKER, fn.toString(), `await ${fn.name}(ea);`, ""].join("\n");
 
 export function build(definitions: SymbolDefinition[]) {
   const items = definitions.map((def) => ({ def, item: buildItem(def) }));
@@ -258,6 +261,7 @@ export function build(definitions: SymbolDefinition[]) {
     rfBlocks: library(rfBlocks),
     catalog: buildCatalog([schematic, rfBlocks]),
     template: buildTemplate(),
-    rotateScript: buildRotateScript(),
+    // By command name: the plugin names a script's command after its file.
+    scripts: { "Rotate 90 degrees": script(rotateSelectionQuarterTurn), "Square Wires": script(squareWires) },
   };
 }
