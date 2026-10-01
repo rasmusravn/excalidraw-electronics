@@ -4,8 +4,8 @@ An Excalidraw library of IEC 60617 electronic schematic symbols and RF block sym
 
 ## What's in it
 
-- **`electronics-schematic.excalidrawlib`**: passives (resistor, potentiometer, capacitors, inductors, ferrite bead, transformer, crystal), diodes, transistors (BJT, MOSFET, JFET), op-amp and comparator, sources, grounds, supply rail, switches, fuses, a generic IC box with Pin stubs, and Junctions. The resistor, potentiometer and fuse also come in an ANSI Variant.
-- **`electronics-rf-blocks.excalidrawlib`**: amplifiers, mixer, oscillators and PLL, filters (IEC wave marks), attenuators, splitter, coupler, circulator, isolator, antenna, RF switches, converters, phase shifter, multiplier and divider, limiter, detector, termination, DC block, bias tee and RF port.
+- **`electronics-schematic.excalidrawlib`**: passives (resistor, potentiometer, capacitors, inductors, ferrite bead, transformer, crystal, thermistor), diodes (incl. PIN and tunnel), transistors (BJT, enhancement and depletion MOSFETs, N- and P-JFET, IGBT, GaN HEMT), op-amp and comparator, sources, grounds, supply rail, switches and relay, fuses, transducers (speaker, microphone, lamp, motor), a generic IC box with Pin stubs, and Junctions. The resistor, potentiometer and fuse also come in an ANSI Variant.
+- **`electronics-rf-blocks.excalidrawlib`**: amplifiers, mixer, oscillator, local oscillator, VCO, PLL, I/Q modulator and demodulator, filters (IEC wave marks, plus tunable band-pass, notch and SAW/BAW), attenuators, splitter/combiner, coupler, circulator, isolator, 90° and 180° hybrids, diplexer, antennas (single, array, horn), RF switches, converters, digital blocks (FPGA, DSP, NCO, FFT), phase shifter, multiplier and divider, limiter, detector, termination, DC block, bias tee, waveguide parts and RF port.
 - **`catalog.excalidraw`**: every Symbol laid out and named, with the how-to-wire note.
 
 ## Install
