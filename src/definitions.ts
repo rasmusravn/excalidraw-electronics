@@ -19,7 +19,7 @@ import {
 import { led, photodiode, plainDiode, schottky, varactor, zener } from "./symbols/diodes.ts";
 import { npn } from "./symbols/transistors.ts";
 import { signalGround } from "./symbols/grounds.ts";
-import { icBox, pinStub } from "./symbols/ic.ts";
+import { icBox, junctionDot, pinStub } from "./symbols/ic.ts";
 import { amplifier, antenna, bandPassFilter, mixer, rfPort } from "./symbols/blocks.ts";
 
 export const definitions: SymbolDefinition[] = [
@@ -47,6 +47,7 @@ export const definitions: SymbolDefinition[] = [
   fuseAnsi,
   icBox,
   pinStub,
+  junctionDot,
   amplifier,
   mixer,
   bandPassFilter,

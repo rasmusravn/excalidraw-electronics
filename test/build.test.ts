@@ -137,3 +137,12 @@ test("the Core diodes follow the passives in the spec's order", () => {
   const start = names.indexOf("Crystal") + 1;
   assert.deepEqual(names.slice(start, start + diodes.length), diodes);
 });
+
+test("the Junction is in the schematic Library: a filled dot over one tiny centred Pin target", () => {
+  const item = build(definitions).schematic.libraryItems.find((i) => i.name === "Junction");
+  assert.ok(item, "Junction");
+  const target = item.elements.find((e) => e.type === "ellipse" && e.opacity === 0)!;
+  const dot = item.elements.find((e) => e.type === "line" && e.backgroundColor !== "transparent")!;
+  assert.ok(target.width <= 1 && target.height <= 1, "the target is tiny, so a Wire stops at the dot's edge");
+  assert.deepEqual([target.x + target.width / 2, target.y + target.height / 2], [dot.x - 5, dot.y]);
+});

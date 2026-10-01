@@ -1,4 +1,4 @@
-import { line, pin, rect, schematicLabels, RIGHT } from "../primitives.ts";
+import { junction, line, pin, rect, schematicLabels, RIGHT } from "../primitives.ts";
 import type { SymbolDefinition } from "../build.ts";
 
 // An 80×120 box with its corners on the grid. To resize it, double-click into the group and drag
@@ -20,4 +20,15 @@ export const pinStub: SymbolDefinition = {
   kind: "Schematic",
   shapes: [line([0, 0], [20, 0])],
   pins: [pin(0, 0, RIGHT)],
+};
+
+// A filled dot where Wires meet. Arrows can't attach to other arrows, so Wires that join all
+// attach to a Junction instead.
+export const junctionDot: SymbolDefinition = {
+  name: "Junction",
+  variant: "IEC",
+  tier: "Core",
+  kind: "Schematic",
+  shapes: [],
+  pins: [junction(0, 0)],
 };
