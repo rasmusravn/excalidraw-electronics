@@ -81,10 +81,10 @@ export const oscillator = block(
   [pin(80, 0, LEFT)],
 );
 // A local oscillator: a circle with a sine, its output Pin on top at (0,0), so it can sit under a
-// mixer and feed its LO input straight up. The label goes to the right of the circle.
+// mixer and feed its LO input straight up. "LO" and its frequency stack to the right of the circle.
 export const localOscillator = block(
   "Local oscillator",
-  [line([0, 0], [0, 20]), ellipse(0, 40, 20), sine(-12, 40, 24, 6), text(26, 40 - LINE_HEIGHT / 2, "LO")],
+  [line([0, 0], [0, 20]), ellipse(0, 40, 20), sine(-12, 40, 24, 6), text(26, 40 - LINE_HEIGHT, "LO"), text(26, 40, "1 GHz")],
   [pin(0, 0, DOWN)],
 );
 

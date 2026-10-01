@@ -302,3 +302,9 @@ test("the local oscillator follows the oscillator: a circle with a sine, its one
   assert.equal(p.y, topmost, "the Pin is the topmost point");
   assert.deepEqual(p.dir, [0, 1], "its lead runs down from the Pin into the circle");
 });
+
+test("the local oscillator carries its frequency as a second editable label", () => {
+  const lo = build(definitions).rfBlocks.libraryItems.find((i) => i.name === "Local oscillator")!;
+  const texts = lo.elements.filter((e) => e.type === "text").map((e) => e.text);
+  assert.deepEqual(texts, ["LO", "1 GHz"]);
+});
