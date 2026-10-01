@@ -7,6 +7,7 @@
   "scripts": {
     "build": "node src/cli.ts",
     "install-vault": "node src/cli.ts --install",
+    "readme-image": "node scripts/readme-image.ts",
     "typecheck": "tsc",
     "pretest": "node test/bundle-upstream.ts",
     "test": "node --test test/*.test.ts"

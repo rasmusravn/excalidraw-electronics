@@ -2,6 +2,10 @@
 
 An Excalidraw library of IEC 60617 electronic schematic symbols and RF block symbols, made for the Obsidian Excalidraw plugin. Every Pin lands on the 20px grid, and Wires drawn as elbow arrows attach to Pins and follow when a Symbol moves. See `CONTEXT.md` for the vocabulary.
 
+![A superheterodyne receiver chain drawn from the Library: antenna, band-pass filter, LNA, mixer with a local oscillator, IF band-pass filter, variable-gain amplifier and ADC](docs/images/receiver.png)
+
+*Drawn from the Library's own Symbols. Open [`docs/images/receiver.excalidraw`](docs/images/receiver.excalidraw) in Excalidraw to edit it; `npm run readme-image` rebuilds it.*
+
 ## What's in it
 
 - **`electronics-schematic.excalidrawlib`**: passives (resistor, potentiometer, capacitors, inductors, ferrite bead, transformer, crystal, thermistor), diodes (incl. PIN and tunnel), transistors (BJT, enhancement and depletion MOSFETs, N- and P-JFET, IGBT, GaN HEMT), op-amp and comparator, sources, grounds, supply rail, switches and relay, fuses, transducers (speaker, microphone, lamp, motor), a generic IC box with Pin stubs, and Junctions. The resistor, potentiometer and fuse also come in an ANSI Variant.
