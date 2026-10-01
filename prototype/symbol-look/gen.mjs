@@ -28,6 +28,11 @@ const VARIANTS = {
     font: { id: 3, file: "Cascadia", size: 14, lh: 1.2 },
     stroke: 1.5, s: 1, pinMarks: true, npnCircle: true, labels: "above", blockLabel: "inside",
   },
+  D: {
+    title: "D: C, elbow-ready (Pin targets inset along the lead so elbow-arrow ends land on the pin; dots not bindable)",
+    font: { id: 3, file: "Cascadia", size: 14, lh: 1.2 },
+    stroke: 1.5, s: 1, pinMarks: true, npnCircle: true, labels: "above", blockLabel: "inside", elbowPins: true,
+  },
 };
 
 const fonts = {};
@@ -78,12 +83,28 @@ const text = (x, y, str, align = "left") => {
   });
 };
 const pins = [];
-const pin = (x, y) => {
+// dir = unit vector pointing from the pin end inward along its lead
+const pin = (x, y, dir = [0, 0]) => {
   pins.push([x, y]);
-  const out = [circ(x, y, 5, { opacity: 0, customData: { pin: true } })]; // Pin target
-  if (ctx.v.pinMarks) out.push(circ(x, y, 2.5));
+  const out = [];
+  if (ctx.v.elbowPins) {
+    // Elbow arrows snap to the target's nearest side midpoint, then sit BASE_BINDING_GAP (5) +
+    // strokeWidth/2 outside it. Inset the target by r + gap so that point is the pin end.
+    const r = 5, sw = 0.5, inset = r + 5 + sw / 2;
+    out.push(circ(x + dir[0] * inset, y + dir[1] * inset, r, { opacity: 0, strokeWidth: sw, customData: { pin: [x, y] } }));
+    // visible dot drawn as a closed line polygon: lines are not bindable, so it can't steal the wire
+    if (ctx.v.pinMarks) {
+      const pts = [];
+      for (let i = 0; i <= 12; i++) pts.push([x + 2.5 * Math.cos((i * Math.PI) / 6), y + 2.5 * Math.sin((i * Math.PI) / 6)]);
+      out.push(poly(pts, { polygon: true }));
+    }
+  } else {
+    out.push(circ(x, y, 5, { opacity: 0, customData: { pin: [x, y] } })); // Pin target
+    if (ctx.v.pinMarks) out.push(circ(x, y, 2.5));
+  }
   return out;
 };
+const R = [1, 0], Lf = [-1, 0], D = [0, 1], U = [0, -1];
 const sine = (x0, cy, w, a) => {
   const pts = [];
   for (let i = 0; i <= 16; i++) pts.push([x0 + (w * i) / 16, cy - a * Math.sin((2 * Math.PI * i) / 16)]);
@@ -114,19 +135,19 @@ const SYMBOLS = {
   "Resistor": () => {
     const s = ctx.v.s, len = g(Math.round(4 * s)), bw = len - g(2), bh = Math.round(14 * s), y = 0;
     return [L([0, y], [g(1), y]), rect(g(1), y - bh / 2, bw, bh), L([g(1) + bw, y], [len, y]),
-      ...pin(0, y), ...pin(len, y), ...schemLabels(g(1), y - bh / 2, y + bh / 2, "R?", "10k")];
+      ...pin(0, y, R), ...pin(len, y, Lf), ...schemLabels(g(1), y - bh / 2, y + bh / 2, "R?", "10k")];
   },
   "Resistor (ANSI)": () => {
     const s = ctx.v.s, len = g(Math.round(4 * s)), bw = len - g(2), a = Math.round(7 * s), pts = [[g(1), 0]];
     for (let i = 1; i <= 6; i++) pts.push([g(1) + (bw * (2 * i - 1)) / 12, i % 2 ? -a : a]);
     pts.push([g(1) + bw, 0]);
     return [L([0, 0], [g(1), 0]), poly(pts), L([g(1) + bw, 0], [len, 0]),
-      ...pin(0, 0), ...pin(len, 0), ...schemLabels(g(1), -a, a, "R?", "10k")];
+      ...pin(0, 0, R), ...pin(len, 0, Lf), ...schemLabels(g(1), -a, a, "R?", "10k")];
   },
   "Capacitor": () => {
     const s = ctx.v.s, len = g(Math.round(3 * s)), c = len / 2, gap = Math.round(5 * s), h = Math.round(14 * s);
     return [L([0, 0], [c - gap, 0]), L([c - gap, -h], [c - gap, h]), L([c + gap, -h], [c + gap, h]),
-      L([c + gap, 0], [len, 0]), ...pin(0, 0), ...pin(len, 0), ...schemLabels(0, -h, h, "C?", "100n")];
+      L([c + gap, 0], [len, 0]), ...pin(0, 0, R), ...pin(len, 0, Lf), ...schemLabels(0, -h, h, "C?", "100n")];
   },
   "NPN transistor": () => {
     // Pins B (0, 2u), C (2u, 0), E (2u, 4u) with u = 20*s; s ∈ {1, 1.5} keeps all three on the grid.
@@ -141,7 +162,7 @@ const SYMBOLS = {
     out.push(filled([tx, ty], [tx - a * ux + (a / 2) * uy, ty - a * uy - (a / 2) * ux], [tx - a * ux - (a / 2) * uy, ty - a * uy + (a / 2) * ux]));
     const [cx, cy] = P(34, 40), r = 20 * m;
     if (ctx.v.npnCircle) out.push(circ(cx, cy, r));
-    out.push(...pin(...P(0, 40)), ...pin(...P(40, 0)), ...pin(...P(40, 80)));
+    out.push(...pin(...P(0, 40), R), ...pin(...P(40, 0), D), ...pin(...P(40, 80), U));
     const lx = (ctx.v.npnCircle ? cx + r : 40 * m) + 6;
     out.push(text(lx, cy - th(), "Q?"), text(lx, cy, "BFR92"));
     return out;
@@ -149,14 +170,14 @@ const SYMBOLS = {
   "Amplifier": () => {
     const s = ctx.v.s, w = g(Math.round(2 * s)), lead = g(1), h = w; // triangle w×h
     return [L([0, 0], [lead, 0]), poly([[lead, -h / 2], [lead + w, 0], [lead, h / 2], [lead, -h / 2]], { polygon: true }),
-      L([lead + w, 0], [2 * lead + w, 0]), ...pin(0, 0), ...pin(2 * lead + w, 0),
+      L([lead + w, 0], [2 * lead + w, 0]), ...pin(0, 0, R), ...pin(2 * lead + w, 0, Lf),
       ...blockLabel(lead + w / 2, -h / 2, h / 2, "LNA", false)];
   },
   "Mixer": () => {
     const s = ctx.v.s, r = g(Math.round(1 * s)), lead = g(1), cx = lead + r, k = r / Math.SQRT2;
     return [L([0, 0], [lead, 0]), circ(cx, 0, r), L([cx - k, -k], [cx + k, k]), L([cx - k, k], [cx + k, -k]),
       L([cx + r, 0], [cx + r + lead, 0]), L([cx, r], [cx, r + lead]),
-      ...pin(0, 0), ...pin(cx + r + lead, 0), ...pin(cx, r + lead),
+      ...pin(0, 0, R), ...pin(cx + r + lead, 0, Lf), ...pin(cx, r + lead, U),
       text(cx + r / 2 + 4, -r - th(), "MIX")];
   },
   "Band-pass filter": () => {
@@ -171,7 +192,7 @@ const SYMBOLS = {
     });
     if (inside) out.push(text(x0 + w / 2, w * 0.12, "BPF", "center"));
     else out.push(text(x0 + w / 2, w / 2 + 4, "BPF 2.4G", "center"));
-    out.push(...pin(0, 0), ...pin(x0 + w + lead, 0));
+    out.push(...pin(0, 0, R), ...pin(x0 + w + lead, 0, Lf));
     return out;
   },
 };
@@ -242,4 +263,4 @@ fs.writeFileSync(new URL("out/proto-catalog.excalidraw", import.meta.url), JSON.
   type: "excalidraw", version: 2, source: "excalidraw-electronics prototype", elements: catalog,
   appState: { gridSize: GRID, gridModeEnabled: true, viewBackgroundColor: "#ffffff" }, files: {},
 }, null, 2));
-console.log("wrote out/proto-{A,B,C}.excalidrawlib and out/proto-catalog.excalidraw");
+console.log("wrote out/proto-{A,B,C,D}.excalidrawlib and out/proto-catalog.excalidraw");

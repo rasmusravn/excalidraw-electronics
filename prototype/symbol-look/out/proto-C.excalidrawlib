@@ -209,7 +209,10 @@
           "link": null,
           "locked": false,
           "customData": {
-            "pin": true
+            "pin": [
+              0,
+              0
+            ]
           },
           "index": "a4"
         },
@@ -272,7 +275,10 @@
           "link": null,
           "locked": false,
           "customData": {
-            "pin": true
+            "pin": [
+              80,
+              0
+            ]
           },
           "index": "a6"
         },
@@ -632,7 +638,10 @@
           "link": null,
           "locked": false,
           "customData": {
-            "pin": true
+            "pin": [
+              0,
+              0
+            ]
           },
           "index": "a4"
         },
@@ -695,7 +704,10 @@
           "link": null,
           "locked": false,
           "customData": {
-            "pin": true
+            "pin": [
+              80,
+              0
+            ]
           },
           "index": "a6"
         },
@@ -1077,7 +1089,10 @@
           "link": null,
           "locked": false,
           "customData": {
-            "pin": true
+            "pin": [
+              0,
+              0
+            ]
           },
           "index": "a5"
         },
@@ -1140,7 +1155,10 @@
           "link": null,
           "locked": false,
           "customData": {
-            "pin": true
+            "pin": [
+              60,
+              0
+            ]
           },
           "index": "a7"
         },
@@ -1614,7 +1632,10 @@
           "link": null,
           "locked": false,
           "customData": {
-            "pin": true
+            "pin": [
+              0,
+              40
+            ]
           },
           "index": "a7"
         },
@@ -1677,7 +1698,10 @@
           "link": null,
           "locked": false,
           "customData": {
-            "pin": true
+            "pin": [
+              40,
+              0
+            ]
           },
           "index": "a9"
         },
@@ -1740,7 +1764,10 @@
           "link": null,
           "locked": false,
           "customData": {
-            "pin": true
+            "pin": [
+              40,
+              80
+            ]
           },
           "index": "aB"
         },
@@ -2084,7 +2111,10 @@
           "link": null,
           "locked": false,
           "customData": {
-            "pin": true
+            "pin": [
+              0,
+              0
+            ]
           },
           "index": "a4"
         },
@@ -2147,7 +2177,10 @@
           "link": null,
           "locked": false,
           "customData": {
-            "pin": true
+            "pin": [
+              80,
+              0
+            ]
           },
           "index": "a6"
         },
@@ -2566,7 +2599,10 @@
           "link": null,
           "locked": false,
           "customData": {
-            "pin": true
+            "pin": [
+              0,
+              0
+            ]
           },
           "index": "a7"
         },
@@ -2629,7 +2665,10 @@
           "link": null,
           "locked": false,
           "customData": {
-            "pin": true
+            "pin": [
+              80,
+              0
+            ]
           },
           "index": "a9"
         },
@@ -2692,7 +2731,10 @@
           "link": null,
           "locked": false,
           "customData": {
-            "pin": true
+            "pin": [
+              40,
+              40
+            ]
           },
           "index": "aB"
         },
@@ -3422,7 +3464,10 @@
           "link": null,
           "locked": false,
           "customData": {
-            "pin": true
+            "pin": [
+              0,
+              0
+            ]
           },
           "index": "aA"
         },
@@ -3485,7 +3530,10 @@
           "link": null,
           "locked": false,
           "customData": {
-            "pin": true
+            "pin": [
+              80,
+              0
+            ]
           },
           "index": "aC"
         },
