@@ -1,22 +1,27 @@
 # Excalidraw Electronics
 
-A Generator for an Excalidraw library of IEC 60617 electronic schematic symbols and RF block symbols, for the Obsidian Excalidraw plugin. See `CONTEXT.md` for the vocabulary.
+An Excalidraw library of IEC 60617 electronic schematic symbols and RF block symbols, made for the Obsidian Excalidraw plugin. Every Pin lands on the 20px grid, and Wires drawn as elbow arrows attach to Pins and follow when a Symbol moves. See `CONTEXT.md` for the vocabulary.
 
-Needs Node 26 (it runs the TypeScript directly).
+## What's in it
 
-```sh
-npm install
-npm run build          # writes out/*.excalidrawlib and out/catalog.excalidraw
-npm run install-vault  # also copies them into the vault named by VAULT in .env
-npm test               # imports the Library through the Obsidian fork's and upstream Excalidraw's own code
-npm run typecheck
-```
+- **`electronics-schematic.excalidrawlib`**: passives (resistor, potentiometer, capacitors, inductors, ferrite bead, transformer, crystal), diodes, transistors (BJT, MOSFET, JFET), op-amp and comparator, sources, grounds, supply rail, switches, fuses, a generic IC box with Pin stubs, and Junctions. The resistor, potentiometer and fuse also come in an ANSI Variant.
+- **`electronics-rf-blocks.excalidrawlib`**: amplifiers, mixer, oscillators and PLL, filters (IEC wave marks), attenuators, splitter, coupler, circulator, isolator, antenna, RF switches, converters, phase shifter, multiplier and divider, limiter, detector, termination, DC block, bias tee and RF port.
+- **`catalog.excalidraw`**: every Symbol laid out and named, with the how-to-wire note.
 
-Copy `.env.example` to `.env` and set `VAULT`. The Library files go into the vault's `Excalidraw/Libraries/` folder, which the plugin loads when its library storage is set to the vault.
+## Install
 
-`--install` also writes `Excalidraw/Template.excalidraw.md`, the plugin's default template path, unless a template you made yourself is already there. Every new drawing then starts with the 20px grid on, and the arrow tool draws Wires: elbow arrows with no arrowheads.
+Download the files from the latest [release](https://github.com/rasmusravn/excalidraw-electronics/releases/latest).
 
-`--install` also adds a "Square Wires" script on Alt+W (see How to wire), and a "Rotate 90 degrees" script to the plugin's script folder and binds it to Ctrl/Cmd+R, unless that hotkey is taken. It turns the selected Symbols exactly a quarter turn clockwise, keeps their Pins on the grid and re-routes the Wires attached to them. Reload Obsidian after the first install so it picks up the hotkey.
+**Drop into the vault (recommended).** Needs the Obsidian Excalidraw plugin 2.28.1 or later, with its library stored in the vault (plugin settings, library storage). Put both `.excalidrawlib` files into the vault's `Excalidraw/Libraries/` folder. The plugin loads them by itself, and replacing them with a newer release updates the items in place.
+
+**Import through the library menu.** In any Excalidraw drawing, open the library panel, then its menu, then *Open*, and pick each `.excalidrawlib` file. This works without vault library storage, and in plain Excalidraw too.
+
+If the vault syncs with Obsidian Sync, turn on *Sync all other types* under Settings, Sync, on every device: `.excalidrawlib` and `.excalidraw` files are skipped otherwise.
+
+**Optional extras**, also attached to the release:
+
+- `Template.excalidraw.md`: put it at `Excalidraw/Template.excalidraw.md`, the plugin's default template path. New drawings then start with the 20px grid on and the arrow tool drawing Wires: elbow arrows with no arrowheads.
+- `Rotate 90 degrees.md` and `Square Wires.md`: put them in the plugin's script folder (`Excalidraw/Scripts/`). Each becomes a command; bind Ctrl/Cmd+R to Rotate 90 degrees and Alt+W to Square Wires under Settings, Hotkeys. Rotate 90 degrees turns the selected Symbols exactly a quarter turn, keeping their Pins on the grid and their Wires attached.
 
 ## How to wire
 
@@ -34,3 +39,17 @@ Limits:
 - Lines drawn with the Line tool never attach.
 
 The same note is at the top of `catalog.excalidraw`.
+
+## Development
+
+The Library is made by a Generator: each Symbol is a small TypeScript module built from shared primitives, never drawn by hand. Needs Node 26 (it runs the TypeScript directly).
+
+```sh
+npm install
+npm run build          # writes everything to out/
+npm run install-vault  # also installs it all into the vault named by VAULT in .env
+npm test               # imports the Library through the Obsidian fork's and upstream Excalidraw's own code
+npm run typecheck
+```
+
+Copy `.env.example` to `.env` and set `VAULT`. `install-vault` copies the Libraries into `Excalidraw/Libraries/`, the catalog into `Electronics/`, the template to `Excalidraw/Template.excalidraw.md` and the scripts into the plugin's script folder, and binds Ctrl/Cmd+R and Alt+W when those hotkeys are free. It never replaces a template or script you made yourself. Reload Obsidian after the first install so it picks up the hotkeys.
