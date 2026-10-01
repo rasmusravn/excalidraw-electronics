@@ -139,7 +139,7 @@ const library = (libraryItems: LibraryItem[]): Library => ({
 const HOW_TO_WIRE = `How to wire
 - Draw Wires with the arrow tool set to elbow, with no arrowheads.
   Drawings started from the template already are.
-- Drag each Wire end to a Pin along its lead. It ends on the Pin dot,
+- Drag each Wire end to a Pin along its lead. It ends on the end of the lead,
   stays attached and stays at right angles when the Symbol moves.
 - Join Wires at a Junction: attach each Wire to one of its legs, like a Pin.
 - Turn Symbols with Ctrl/Cmd+R (Rotate 90 degrees), not the rotate handle.

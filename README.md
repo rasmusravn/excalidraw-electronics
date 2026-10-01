@@ -21,7 +21,7 @@ Copy `.env.example` to `.env` and set `VAULT`. The Library files go into the vau
 ## How to wire
 
 - Draw Wires with the arrow tool set to **elbow**, with no arrowheads. Drawings started from the template already are.
-- Drag each Wire end to a Pin **along its lead**. It ends on the Pin dot, stays attached and stays at right angles when the Symbol moves.
+- Drag each Wire end to a Pin **along its lead**. It ends exactly on the end of the lead, stays attached and stays at right angles when the Symbol moves.
 - Join Wires at a **Junction** (four legs) or **Junction (T)** (three legs): attach each Wire to a leg's Pin, the same way as a Symbol's. Arrows can't attach to other arrows, so a Wire can't end in the middle of another Wire.
 - Turn Symbols with **Ctrl/Cmd+R** (Rotate 90 degrees), not the rotate handle, so their Pins stay on the grid.
 - Elbow Wires always have rounded bends; Excalidraw draws them that way. **Alt+W** (Square Wires) turns the selected Wires, or all Wires when nothing is selected, into sharp arrows through the same points, with right-angle corners and their ends still on their Pins. Squared Wires don't re-route: moving a Symbol makes its segment diagonal. Press Alt+W again to turn them back into elbow Wires. Square them when the diagram is done.

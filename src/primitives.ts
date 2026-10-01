@@ -169,12 +169,8 @@ export const pinShapes = ({ x, y, dir }: Pin): Shape[] => {
     strokeWidth: sw,
     customData: { pinEnd: [-dir[0] * inset, -dir[1] * inset] },
   });
-  // Pin dot: a closed line polygon. Lines aren't bindable, so the dot can't steal a Wire.
-  const dot: Point[] = [];
-  for (let i = 0; i < 12; i++) {
-    dot.push([x + 2.5 * Math.cos((i * Math.PI) / 6), y + 2.5 * Math.sin((i * Math.PI) / 6)]);
-  }
-  return [target, polygon(dot)];
+  // No visible dot: the lead's end marks the Pin, which keeps diagrams quiet.
+  return [target];
 };
 
 // An invisible 1px line. Placement snaps an item's bounding-box top-left to the grid; with one

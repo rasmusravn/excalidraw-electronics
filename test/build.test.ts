@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { build } from "../src/build.ts";
 import { definitions } from "../src/definitions.ts";
-import { line, pin, text, RIGHT, LEFT } from "../src/primitives.ts";
+import { bounds, line, pin, text, RIGHT, LEFT } from "../src/primitives.ts";
 import type { SymbolDefinition } from "../src/build.ts";
 
 test("the schematic Library and the catalog contain the Resistor", () => {
@@ -145,4 +145,24 @@ test("the Junction has a Pin on each of four legs, and the T Junction on three",
   assert.deepEqual(ends("Junction (T)"), [[-20, 0], [20, 0], [0, 20]]);
   const names = build(definitions).schematic.libraryItems.map((i) => i.name);
   assert.equal(names.indexOf("Junction (T)"), names.indexOf("Junction") + 1);
+});
+
+test("Pins have no visible dot: nothing visible sits only at a Pin end", () => {
+  const { schematic, rfBlocks } = build(definitions);
+  for (const item of [...schematic.libraryItems, ...rfBlocks.libraryItems]) {
+    const ends = item.elements
+      .filter((e) => (e.customData as { pinEnd?: number[] } | undefined)?.pinEnd)
+      .map((e) => {
+        const [dx, dy] = (e.customData as { pinEnd: number[] }).pinEnd;
+        return [e.x + e.width / 2 + dx, e.y + e.height / 2 + dy];
+      });
+    for (const e of item.elements.filter((e) => e.opacity !== 0)) {
+      const box = bounds([e]);
+      for (const [x, y] of ends) {
+        const small = box.maxX - box.minX <= 6 && box.maxY - box.minY <= 6;
+        const atPin = Math.abs((box.minX + box.maxX) / 2 - x) < 1 && Math.abs((box.minY + box.maxY) / 2 - y) < 1;
+        assert.ok(!(small && atPin), `${item.name}: a dot at Pin (${x}, ${y})`);
+      }
+    }
+  }
 });
