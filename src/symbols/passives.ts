@@ -1,4 +1,4 @@
-import { arcs, arrowhead, line, pin, polygon, rect, schematicLabels, DOWN, LEFT, RIGHT, UP } from "../primitives.ts";
+import { arcs, arrowhead, line, pin, polygon, rect, schematicLabels, text, DOWN, LEFT, RIGHT, UP } from "../primitives.ts";
 import type { Point, Shape } from "../primitives.ts";
 import type { SymbolDefinition } from "../build.ts";
 
@@ -103,8 +103,14 @@ export const fuseAnsi = ansi(fuse, [...leads, sCurve, ...schematicLabels(20, -7,
 
 // --- Later ---
 
-// The resistor with a bent diagonal through it: a resistance that follows temperature.
+// The resistor with a bent diagonal through it (non-linear) and θ (by temperature).
 export const thermistor: SymbolDefinition = {
-  ...schematic("Thermistor", [...leads, body, line([14, 13], [22, 13], [62, -13]), ...schematicLabels(20, -13, "RT?", "NTC 10k")]),
+  ...schematic("Thermistor", [
+    ...leads,
+    body,
+    line([14, 13], [22, 13], [62, -13]),
+    text(46, 8, "θ"),
+    ...schematicLabels(20, -13, "RT?", "NTC 10k"),
+  ]),
   tier: "Later",
 };

@@ -61,14 +61,15 @@ export const nMosfetDepletion = later(
   transistor(
     "N-MOSFET (depletion)",
     [...gate, solidChannel, ...drainAndSource, body, line([40, 40], [40, 52]), arrowhead([40, 40], [26, 40], 1, 6)],
-    "BF998",
+    "BSS139",
   ),
 );
+// P-channel depletion parts are hardly made, so its value is a plain placeholder.
 export const pMosfetDepletion = later(
   transistor(
     "P-MOSFET (depletion)",
     [...gate, solidChannel, ...drainAndSource, body, line([40, 40], [40, 28]), arrowhead([26, 40], [40, 40], 1, 6)],
-    "P-dep",
+    "PMOS",
   ),
 );
 
@@ -81,19 +82,19 @@ export const pJfet = later(
   ),
 );
 
-// An insulated gate beside a bipolar body: G (0,40), C (40,0), E (40,80), the emitter arrow out.
+// An insulated gate beside a broken (enhancement) channel with a bipolar collector and emitter:
+// G (0,40), C (40,0), E (40,80), the emitter arrow out.
 export const igbt = later(
   transistor(
     "IGBT",
     [
-      line([0, 40], [18, 40]),
-      line([18, 26], [18, 54]),
-      line([24, 26], [24, 54]),
-      upper,
-      lower,
-      arrowhead([24, 46], [40, 60], 0.8),
+      ...gate,
+      ...channel,
+      line([26, 34], [40, 22], [40, 0]),
+      line([26, 46], [40, 58], [40, 80]),
+      arrowhead([26, 46], [40, 58], 0.8),
     ],
-    "IKW40",
+    "IKW40N120H3",
   ),
 );
 
