@@ -128,10 +128,13 @@ const buildItem = (def: SymbolDefinition): LibraryItem => {
   return { id: hashId(`${key}:item`), status: "published", created: CREATED, name, elements };
 };
 
-const library = (libraryItems: LibraryItem[]): Library => ({
+// The release the files belong to, as a URL: the installer reads the installed version from it.
+const sourceOf = (version: string) => `${SOURCE}/releases/tag/v${version}`;
+
+const library = (libraryItems: LibraryItem[], version: string): Library => ({
   type: "excalidrawlib",
   version: 2,
-  source: SOURCE,
+  source: sourceOf(version),
   libraryItems,
 });
 
@@ -153,9 +156,9 @@ Limits
 - Lines drawn with the Line tool never attach.`;
 
 // The how-to-wire note, then one row per Library, every item with its name underneath, all on the grid.
-const buildCatalog = (rows: LibraryItem[][]): Drawing => {
+const buildCatalog = (rows: LibraryItem[][], version: string): Drawing => {
   const shapes: { shape: Shape; key: string; groupIds: string[] }[] = [];
-  const note = text(0, 0, HOW_TO_WIRE);
+  const note = text(0, 0, `${HOW_TO_WIRE}\n\nVersion ${version}`);
   shapes.push({ shape: note, key: "catalog:how-to-wire", groupIds: [] });
   let top = floorToGrid(note.height) + 4 * GRID;
   for (const items of rows.filter((row) => row.length > 0)) {
@@ -177,7 +180,7 @@ const buildCatalog = (rows: LibraryItem[][]): Drawing => {
   return {
     type: "excalidraw",
     version: 2,
-    source: SOURCE,
+    source: sourceOf(version),
     elements: shapes.map(({ shape, key, groupIds }, i) => ({
       ...toElements([shape], key, groupIds)[0],
       index: fractionalIndex(i),
@@ -193,11 +196,11 @@ export const TEMPLATE_MARKER = "excalidraw-electronics-template";
 
 // The drawing new Obsidian Excalidraw drawings start from: no elements, only settings. The grid
 // is on, and the arrow tool draws Wires: elbow arrows without arrowheads.
-const buildTemplate = () => {
+const buildTemplate = (version: string) => {
   const drawing = {
     type: "excalidraw",
     version: 2,
-    source: SOURCE,
+    source: sourceOf(version),
     elements: [],
     appState: {
       gridSize: GRID,
@@ -220,7 +223,7 @@ const buildTemplate = () => {
     "",
     "excalidraw-plugin: parsed",
     "tags: [excalidraw]",
-    `${TEMPLATE_MARKER}: true`,
+    `${TEMPLATE_MARKER}: ${version}`,
     "",
     "---",
     "==⚠  Switch to EXCALIDRAW VIEW in the MORE OPTIONS menu of this document. ⚠==",
@@ -243,9 +246,12 @@ const buildTemplate = () => {
 export const SCRIPT_MARKER = "// excalidraw-electronics script";
 
 // A script ships its function's source text, so the tests run exactly what is installed.
-const script = (fn: (ea: unknown) => Promise<void>) => [SCRIPT_MARKER, fn.toString(), `await ${fn.name}(ea);`, ""].join("\n");
+const script = (fn: (ea: unknown) => Promise<void>, version: string) =>
+  [SCRIPT_MARKER, `// version ${version}`, fn.toString(), `await ${fn.name}(ea);`, ""].join("\n");
 
-export function build(definitions: SymbolDefinition[]) {
+const json = (value: unknown) => `${JSON.stringify(value, null, 2)}\n`;
+
+export function build(definitions: SymbolDefinition[], { version = "0.0.0" }: { version?: string } = {}) {
   const items = definitions.map((def) => ({ def, item: buildItem(def) }));
   const ids = new Set<string>();
   for (const { item } of items) {
@@ -257,12 +263,29 @@ export function build(definitions: SymbolDefinition[]) {
   const ofKind = (kind: SymbolDefinition["kind"]) => items.filter(({ def }) => def.kind === kind).map(({ item }) => item);
   const schematic = ofKind("Schematic");
   const rfBlocks = ofKind("Block");
+  const schematicLibrary = library(schematic, version);
+  const rfBlocksLibrary = library(rfBlocks, version);
+  const catalog = buildCatalog([schematic, rfBlocks], version);
+  const template = buildTemplate(version);
+  // By command name: the plugin names a script's command after its file.
+  const scripts = {
+    "Rotate 90 degrees": script(rotateSelectionQuarterTurn, version),
+    "Square Wires": script(squareWires, version),
+  };
   return {
-    schematic: library(schematic),
-    rfBlocks: library(rfBlocks),
-    catalog: buildCatalog([schematic, rfBlocks]),
-    template: buildTemplate(),
-    // By command name: the plugin names a script's command after its file.
-    scripts: { "Rotate 90 degrees": script(rotateSelectionQuarterTurn), "Square Wires": script(squareWires) },
+    schematic: schematicLibrary,
+    rfBlocks: rfBlocksLibrary,
+    catalog,
+    template,
+    scripts,
+    // The release files: individual and space-free, so a release attaches exactly these.
+    files: {
+      "electronics-schematic.excalidrawlib": json(schematicLibrary),
+      "electronics-rf-blocks.excalidrawlib": json(rfBlocksLibrary),
+      "catalog.excalidraw": json(catalog),
+      "Template.excalidraw.md": template,
+      "Rotate-90-degrees.md": scripts["Rotate 90 degrees"],
+      "Square-Wires.md": scripts["Square Wires"],
+    } as Record<string, string>,
   };
 }

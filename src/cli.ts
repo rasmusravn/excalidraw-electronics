@@ -1,5 +1,6 @@
 // Usage: node src/cli.ts [--install]
-// Writes the Libraries, the catalog and the drawing template to out/. --install also copies them
+// Clears out/, then writes the release files to it: the Libraries, the catalog, the drawing
+// template and the scripts, each stamped with the version in package.json. --install also copies them
 // into the Obsidian vault named by VAULT in .env:
 // - the Libraries into Excalidraw/Libraries/, where the Excalidraw plugin loads them
 // - the template to Excalidraw/Template.excalidraw.md, the plugin's default template path, so
@@ -7,14 +8,15 @@
 // - the catalog into Electronics/
 // - the scripts into the plugin's script folder, each with its hotkey (Rotate 90 degrees on
 //   Ctrl/Cmd+R, Square Wires on Alt+W) unless that hotkey is taken or the command already has one
-import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 import { SCRIPT_MARKER, TEMPLATE_MARKER, build } from "./build.ts";
 import { definitions } from "./definitions.ts";
 
 const out = "out";
-const { schematic, rfBlocks, catalog, template, scripts } = build(definitions);
+const { version } = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8"));
+const { files: releaseFiles, scripts } = build(definitions, { version });
 const install = process.argv.includes("--install");
 type Hotkey = { modifiers: string[]; key: string };
 const HOTKEYS: Record<keyof typeof scripts, Hotkey> = {
@@ -23,16 +25,15 @@ const HOTKEYS: Record<keyof typeof scripts, Hotkey> = {
 };
 const describe = ({ modifiers, key }: Hotkey) => [...modifiers.map((m) => (m === "Mod" ? "Ctrl/Cmd" : m)), key].join("+");
 // marker: a file the Generator manages, which it may replace only if it finds the marker in it.
-const files: Record<string, { content: string; installTo: string; marker?: string }> = {
-  "electronics-schematic.excalidrawlib": { content: json(schematic), installTo: "Excalidraw/Libraries/electronics-schematic.excalidrawlib" },
-  "electronics-rf-blocks.excalidrawlib": { content: json(rfBlocks), installTo: "Excalidraw/Libraries/electronics-rf-blocks.excalidrawlib" },
-  "catalog.excalidraw": { content: json(catalog), installTo: "Electronics/catalog.excalidraw" },
-  "Template.excalidraw.md": { content: template, installTo: "Excalidraw/Template.excalidraw.md", marker: `${TEMPLATE_MARKER}:` },
+// Scripts install under their real names (the plugin names a command after its file); the
+// release names have no spaces.
+const installTo: Record<string, { path: string; marker?: string }> = {
+  "electronics-schematic.excalidrawlib": { path: "Excalidraw/Libraries/electronics-schematic.excalidrawlib" },
+  "electronics-rf-blocks.excalidrawlib": { path: "Excalidraw/Libraries/electronics-rf-blocks.excalidrawlib" },
+  "catalog.excalidraw": { path: "Electronics/catalog.excalidraw" },
+  "Template.excalidraw.md": { path: "Excalidraw/Template.excalidraw.md", marker: `${TEMPLATE_MARKER}:` },
   ...Object.fromEntries(
-    Object.entries(scripts).map(([name, content]) => [
-      `${name}.md`,
-      { content, installTo: `${scriptFolder()}/${name}.md`, marker: SCRIPT_MARKER },
-    ]),
+    Object.keys(scripts).map((name) => [name.replaceAll(" ", "-") + ".md", { path: `${scriptFolder()}/${name}.md`, marker: SCRIPT_MARKER }]),
   ),
 };
 
@@ -79,21 +80,19 @@ function bindHotkeys(vault: string) {
   if (changed) writeFileSync(path, `${JSON.stringify(hotkeys, null, 2)}\n`);
 }
 
-function json(value: unknown) {
-  return `${JSON.stringify(value, null, 2)}\n`;
-}
-
+// Stale files (an old build's extras) must never ship.
+rmSync(out, { recursive: true, force: true });
 mkdirSync(out, { recursive: true });
-for (const [name, { content }] of Object.entries(files)) {
+for (const [name, content] of Object.entries(releaseFiles)) {
   writeFileSync(join(out, name), content);
 }
-console.log(`wrote ${Object.keys(files).map((name) => join(out, name)).join(", ")}`);
+console.log(`wrote ${Object.keys(releaseFiles).map((name) => join(out, name)).join(", ")} (version ${version})`);
 
 if (install) {
   const vault = vaultPath();
   if (!vault) throw new Error("--install needs VAULT in .env (see .env.example)");
-  for (const [name, { installTo, marker }] of Object.entries(files)) {
-    const target = join(vault, installTo);
+  for (const [name, { path, marker }] of Object.entries(installTo)) {
+    const target = join(vault, path);
     // Never replace a file of the user's that happens to sit where ours goes.
     if (marker && existsSync(target) && !readFileSync(target, "utf8").includes(marker)) {
       console.log(`skipped ${target}: an existing file not made by this Generator`);
