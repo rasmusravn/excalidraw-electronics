@@ -43,7 +43,8 @@ export function importSuite(which: "fork" | "upstream") {
         const placed = L.restoreElements(item.elements, null, { deleteInvisibleElements: true });
         const [minX, minY] = L.getCommonBounds(placed);
         const pins = pinEnds(placed);
-        assert.ok(pins.length > 0, `${item.name} has Pins`);
+        const def = definitions.find((d) => item.name === (d.variant === "ANSI" ? `${d.name} (ANSI)` : d.name))!;
+        assert.equal(pins.length, def.pins.length, `${item.name} Pins`);
         for (const [x, y] of pins) {
           assert.ok((x - minX) % GRID === 0 && (y - minY) % GRID === 0,
             `${item.name}: Pin (${x}, ${y}) is not on the grid from top-left (${minX}, ${minY})`);

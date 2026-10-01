@@ -97,3 +97,9 @@ test("the Proof's Block symbols are in the RF-blocks Library and the catalog", (
   const captions = catalog.elements.filter((e) => e.type === "text").map((e) => e.text);
   for (const name of names) assert.ok(captions.includes(name), name);
 });
+
+test("the generic IC box and the Pin stub are in the schematic Library", () => {
+  const names = build(definitions).schematic.libraryItems.map((item) => item.name);
+  assert.ok(names.includes("Generic IC"));
+  assert.ok(names.includes("Pin stub"));
+});
