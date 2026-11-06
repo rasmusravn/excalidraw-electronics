@@ -202,7 +202,9 @@ test("the Core gain, frequency and filtering blocks are in the RF-blocks Library
   ];
   assert.equal(names[0], "Amplifier");
   assert.deepEqual(coreFrom(names, "Amplifier", family.length), family);
-  assert.equal(names.at(-1), "RF port");
+  // The RF port is the last Core block; only the Later RF connectors follow it.
+  const after = names.slice(names.indexOf("RF port") + 1);
+  assert.ok(after.every((n) => n.includes(" connector")), after.join(", "));
 });
 
 test("the four filters differ in their wave marks alone", () => {
@@ -303,7 +305,19 @@ test("the test equipment follows the waveguide parts, tagged Later, ahead of the
   assert.deepEqual(vna.pins.map((p) => p.dir), [[0, -1], [0, -1]]);
 });
 
-test("the local oscillator follows the oscillator:a circle with a sine, its one Pin on top pointing up", () => {
+test("the RF connectors follow the RF port, a panel and an inline Symbol per type, tagged Later", () => {
+  const names = build(definitions).rfBlocks.libraryItems.map((item) => item.name);
+  const types = ["SMA", "N", "BNC", "2.92 mm", "2.4 mm", "3.5 mm", "TNC", "SMB", "SMP", "MMCX", "U.FL"];
+  const family = types.flatMap((t) => [`${t} connector`, `${t} connector (inline)`]);
+  assert.deepEqual(names.slice(names.indexOf("RF port") + 1), family);
+  for (const name of family) {
+    const def = definitions.find((d) => d.name === name)!;
+    assert.equal(def.tier, "Later", name);
+    assert.equal(def.pins.length, name.endsWith("(inline)") ? 2 : 1, name);
+  }
+});
+
+test("the local oscillator follows the oscillator: a circle with a sine, its one Pin on top pointing up", () => {
   const names = build(definitions).rfBlocks.libraryItems.map((item) => item.name);
   assert.equal(names[names.indexOf("Oscillator") + 1], "Local oscillator");
   const lo = definitions.find((d) => d.name === "Local oscillator")!;
