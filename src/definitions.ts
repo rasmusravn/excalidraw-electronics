@@ -75,7 +75,7 @@ import {
 import { diplexer, hybrid180, hybrid90, iqDemodulator, iqModulator } from "./symbols/iq.ts";
 import { dsp, fft, fpga, nco, notchFilter, sawFilter, tunableBandPassFilter } from "./symbols/variants.ts";
 import { connectors } from "./symbols/connectors.ts";
-import { frequencyCounter, networkAnalyzer, noiseSource, oscilloscope, powerMeter, spectrumAnalyzer } from "./symbols/instruments.ts";
+import { dut, dutOnePort, frequencyCounter, networkAnalyzer, noiseSource, oscilloscope, powerMeter, spectrumAnalyzer } from "./symbols/instruments.ts";
 import { arrayAntenna, hornAntenna, waveguideSection, waveguideTermination, waveguideTransition } from "./symbols/waveguide.ts";
 
 export const definitions: SymbolDefinition[] = [
@@ -187,6 +187,8 @@ export const definitions: SymbolDefinition[] = [
   oscilloscope,
   networkAnalyzer,
   noiseSource,
+  dut,
+  dutOnePort,
   rfPort,
   ...connectors,
 ];

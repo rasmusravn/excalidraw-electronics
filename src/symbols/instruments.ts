@@ -1,7 +1,7 @@
 import { ellipse, line, pin, rect, text, LEFT, RIGHT, UP } from "../primitives.ts";
 import type { Pin, Point, Shape } from "../primitives.ts";
 import type { SymbolDefinition } from "../build.ts";
-import { box, LINE_HEIGHT, sine } from "./blocks.ts";
+import { box, leads, LINE_HEIGHT, sine, throughPins } from "./blocks.ts";
 
 // Test equipment: the instruments a bench setup connects to the device under test.
 const instrument = (name: string, shapes: Shape[], pins: Pin[]): SymbolDefinition => ({
@@ -67,3 +67,11 @@ export const noiseSource = instrument(
   [box, line(...noise), line([60, 0], [80, 0]), below("NOISE")],
   [pin(80, 0, LEFT)],
 );
+
+// --- Device under test ---
+
+// A box marked DUT between 20px leads, Pins at (0,0) and (80,0): what the instruments measure.
+const dutLabel = text(40, -LINE_HEIGHT / 2, "DUT", "center");
+export const dut = instrument("DUT", [...leads, box, dutLabel], throughPins);
+// One Pin on the left at (0,0): a one-port device measured in reflection, such as an antenna or a load.
+export const dutOnePort = instrument("DUT (one-port)", [input, box, dutLabel], [pin(0, 0, RIGHT)]);
