@@ -292,7 +292,18 @@ test("the Later filter variants and digital blocks sit in their families, tagged
   }
 });
 
-test("the local oscillator follows the oscillator: a circle with a sine, its one Pin on top pointing up", () => {
+test("the test equipment follows the waveguide parts, tagged Later, ahead of the RF port", () => {
+  const names = build(definitions).rfBlocks.libraryItems.map((item) => item.name);
+  const family = ["Power meter", "Frequency counter", "Spectrum analyzer", "Oscilloscope", "Network analyzer", "Noise source"];
+  const start = names.indexOf("Waveguide termination") + 1;
+  assert.deepEqual(names.slice(start, start + family.length + 1), [...family, "RF port"]);
+  for (const name of family) assert.equal(definitions.find((d) => d.name === name)?.tier, "Later", name);
+  // The network analyzer's two ports point down, for the device under test between them.
+  const vna = definitions.find((d) => d.name === "Network analyzer")!;
+  assert.deepEqual(vna.pins.map((p) => p.dir), [[0, -1], [0, -1]]);
+});
+
+test("the local oscillator follows the oscillator:a circle with a sine, its one Pin on top pointing up", () => {
   const names = build(definitions).rfBlocks.libraryItems.map((item) => item.name);
   assert.equal(names[names.indexOf("Oscillator") + 1], "Local oscillator");
   const lo = definitions.find((d) => d.name === "Local oscillator")!;
