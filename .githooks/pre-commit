@@ -1,0 +1,52 @@
+#!/bin/sh
+# Refuses a commit whose staged changes add what looks like confidential information: a key or
+# token, a hard-coded password, a home-directory path, a credentials file, or one of your own
+# terms. This repository is public, so anything committed is published.
+#
+# Turn it on:  git config core.hooksPath .githooks   (npm install does this)
+# Your terms:  one per line in .git/info/confidential-terms (employer, customer and project
+#              names, work email). That file is never committed. Matching ignores case.
+# Let a line through: end it with "confidential-ok", or commit with --no-verify.
+
+terms=$(git rev-parse --git-path info/confidential-terms)
+found=0
+report() {
+  [ -n "$2" ] || return 0
+  [ $found -eq 1 ] || echo "pre-commit: this commit may contain confidential information" >&2
+  found=1
+  echo "  $1:" >&2
+  echo "$2" | sed 's/^/    /' >&2
+}
+
+# Every added line as file:line:text.
+added=$(git diff --cached --no-color -U0 --diff-filter=ACMR | awk '
+  /^\+\+\+ / { file = substr($0, 7); next }
+  /^@@ / { split($3, at, ","); n = substr(at[1], 2) + 0; next }
+  /^\+/ { print file ":" n ":" substr($0, 2); n++ }
+' | grep -v 'confidential-ok$')
+
+match() { echo "$added" | grep -E $2 -e "$1"; }
+
+report "private key" "$(match '-----BEGIN [A-Z ]*PRIVATE KEY-----')"
+report "access token or API key" "$(match '(AKIA|ASIA)[0-9A-Z]{16}|gh[pousr]_[A-Za-z0-9]{36,}|github_pat_[A-Za-z0-9_]{22,}|glpat-[A-Za-z0-9_-]{20,}|sk-[A-Za-z0-9_-]{20,}|xox[abprs]-[A-Za-z0-9-]{10,}|AIza[0-9A-Za-z_-]{35}|eyJ[A-Za-z0-9_-]{10,}\.eyJ[A-Za-z0-9_-]{10,}\.')"
+report "hard-coded credential" "$(match '(password|passwd|secret|api[_-]?key|access[_-]?token|auth[_-]?token)["'\'']?[[:space:]]*[:=][[:space:]]*["'\''][^"'\'' ]{8,}["'\'']' -i)"
+report "credentials in a URL" "$(match '[a-z][a-z0-9+.-]*://[^/[:space:]:@]+:[^/[:space:]:@]+@')"
+report "home-directory path" "$(match '(/home|/Users)/[A-Za-z][A-Za-z0-9._-]*/|[A-Z]:\\Users\\[A-Za-z]')"
+
+report "file that usually holds secrets" "$(git diff --cached --name-only --diff-filter=ACMR |
+  grep -E -i '(^|/)(\.env(\..*)?|id_(rsa|dsa|ecdsa|ed25519)|credentials\.json|\.npmrc|\.netrc|.*\.(pem|key|p12|pfx|kdbx))$' |
+  grep -v '\.env\.example$')"
+
+if [ -s "$terms" ]; then
+  mine=$(grep -v -e '^#' -e '^[[:space:]]*$' "$terms")
+  if [ -n "$mine" ]; then
+    report "one of your confidential terms" "$(echo "$added" | grep -i -F -e "$mine")"
+    report "one of your confidential terms, in a file name" "$(git diff --cached --name-only --diff-filter=ACMR | grep -i -F -e "$mine")"
+    report "one of your confidential terms, in the author or committer" "$( (git var GIT_AUTHOR_IDENT; git var GIT_COMMITTER_IDENT) | sed 's/ [0-9]* [+-][0-9]*$//' | sort -u | grep -i -F -e "$mine")"
+  fi
+fi
+
+if [ $found -eq 1 ]; then
+  echo "Remove it, or see .githooks/pre-commit for how to let a false alarm through." >&2
+  exit 1
+fi

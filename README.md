@@ -87,6 +87,8 @@ npm test               # imports the Library through the Obsidian fork's and ups
 npm run typecheck
 ```
 
+`npm install` also turns on the pre-commit hook in `.githooks/`, which refuses a commit that adds a key, token, password, home-directory path or one of your own confidential terms (one per line in `.git/info/confidential-terms`, which is never committed).
+
 Copy `.env.example` to `.env` and set `VAULT`. `install-vault` copies the Libraries into `Excalidraw/Libraries/`, the catalog into `Electronics/`, the template to `Excalidraw/Template.excalidraw.md` and the scripts into the plugin's script folder, and binds Ctrl/Cmd+R and Alt+W when those hotkeys are free. It never replaces a template or script you made yourself. Reload Obsidian after the first install so it picks up the hotkeys.
 
 ## Licence

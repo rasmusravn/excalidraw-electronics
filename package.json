@@ -5,6 +5,7 @@
   "description": "Generator for an Excalidraw library of IEC electronic and RF block symbols",
   "type": "module",
   "scripts": {
+    "prepare": "git config core.hooksPath .githooks",
     "build": "node src/cli.ts",
     "install-vault": "node src/cli.ts --install",
     "readme-image": "node scripts/readme-image.ts",
