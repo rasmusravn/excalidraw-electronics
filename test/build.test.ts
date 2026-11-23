@@ -202,9 +202,9 @@ test("the Core gain, frequency and filtering blocks are in the RF-blocks Library
   ];
   assert.equal(names[0], "Amplifier");
   assert.deepEqual(coreFrom(names, "Amplifier", family.length), family);
-  // The RF port is the last Core block; only the Later RF connectors follow it.
+  // The RF port is the last Core block; only the Later RF connectors and cable assemblies follow it.
   const after = names.slice(names.indexOf("RF port") + 1);
-  assert.ok(after.every((n) => n.includes(" connector")), after.join(", "));
+  assert.ok(after.every((n) => n.includes(" connector") || n.endsWith(" cable assembly")), after.join(", "));
 });
 
 test("the four filters differ in their wave marks alone", () => {
@@ -318,12 +318,35 @@ test("the RF connectors follow the RF port, a panel and an inline Symbol per typ
   const names = build(definitions).rfBlocks.libraryItems.map((item) => item.name);
   const types = ["SMA", "N", "BNC", "2.92 mm", "2.4 mm", "3.5 mm", "TNC", "SMB", "SMP", "MMCX", "U.FL"];
   const family = types.flatMap((t) => [`${t} connector`, `${t} connector (inline)`]);
-  assert.deepEqual(names.slice(names.indexOf("RF port") + 1), family);
+  const start = names.indexOf("RF port") + 1;
+  assert.deepEqual(names.slice(start, start + family.length), family);
   for (const name of family) {
     const def = definitions.find((d) => d.name === name)!;
     assert.equal(def.tier, "Later", name);
     assert.equal(def.pins.length, name.endsWith("(inline)") ? 2 : 1, name);
   }
+});
+
+test("the cable assemblies come last: a Pin at each end, a right-angle end's below the cable pointing up", () => {
+  const names = build(definitions).rfBlocks.libraryItems.map((item) => item.name);
+  const family = names.slice(names.indexOf("U.FL connector (inline)") + 1);
+  assert.equal(family.length, 18);
+  assert.equal(new Set(family).size, family.length);
+  for (const name of family) {
+    assert.match(name, / cable assembly$/);
+    const def = definitions.find((d) => d.name === name)!;
+    assert.equal(def.tier, "Later", name);
+    const [a, b] = def.pins;
+    assert.equal(def.pins.length, 2, name);
+    assert.deepEqual([a.x, a.y, a.dir], [0, 0, [1, 0]], name);
+    assert.ok(b.x >= 100 && b.x % 20 === 0 && b.y % 20 === 0, name);
+    assert.deepEqual(b.dir, name.includes("right-angle") ? [0, -1] : [-1, 0], name);
+    assert.equal(b.y > 0, name.includes("right-angle"), name);
+  }
+  // The one asked for: an SMA jack on the left, a right-angle SMP plug on the right, both named in the label.
+  const def = definitions.find((d) => d.name === "SMA (F) to SMP (F) right-angle cable assembly")!;
+  assert.ok(def.shapes.some((s) => s.text === "SMA-F to SMP-F RA"));
+  assert.deepEqual(def.pins.map((p) => [p.x, p.y]), [[0, 0], [120, 40]]);
 });
 
 test("the local oscillator follows the oscillator: a circle with a sine, its one Pin on top pointing up", () => {
