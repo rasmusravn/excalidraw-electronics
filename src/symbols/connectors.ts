@@ -269,6 +269,7 @@ const assemblies: [End, End][] = [
   [end("SMA", "M"), end("SMA", "M", true)],
   [end("SMA", "M"), end("SMA", "F")],
   [end("SMA", "F"), end("SMP", "F", true)],
+  [end("SMA", "M"), end("SMP", "F", true)],
   [end("SMA", "M"), end("SMP", "F")],
   [end("SMP", "F"), end("SMP", "F")],
   [end("SMA", "M"), end("N", "M")],

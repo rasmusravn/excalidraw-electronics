@@ -330,7 +330,7 @@ test("the RF connectors follow the RF port, a panel and an inline Symbol per typ
 test("the cable assemblies come last: a Pin at each end, a right-angle end's below the cable pointing up", () => {
   const names = build(definitions).rfBlocks.libraryItems.map((item) => item.name);
   const family = names.slice(names.indexOf("U.FL connector (inline)") + 1);
-  assert.equal(family.length, 18);
+  assert.equal(family.length, 19);
   assert.equal(new Set(family).size, family.length);
   for (const name of family) {
     assert.match(name, / cable assembly$/);
