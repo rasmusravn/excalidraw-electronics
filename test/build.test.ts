@@ -296,13 +296,16 @@ test("the Later filter variants and digital blocks sit in their families, tagged
 
 test("the test equipment and DUT follow the waveguide parts, tagged Later, ahead of the RF port", () => {
   const names = build(definitions).rfBlocks.libraryItems.map((item) => item.name);
-  const family = ["Power meter", "Frequency counter", "Spectrum analyzer", "Oscilloscope", "Network analyzer", "Noise source", "DUT", "DUT (one-port)"];
+  const family = ["Power meter", "Frequency counter", "Spectrum analyzer", "Oscilloscope", "Network analyzer", "Network analyzer (4-port)", "Noise source", "DUT", "DUT (one-port)"];
   const start = names.indexOf("Waveguide termination") + 1;
   assert.deepEqual(names.slice(start, start + family.length + 1), [...family, "RF port"]);
   for (const name of family) assert.equal(definitions.find((d) => d.name === name)?.tier, "Later", name);
   // The network analyzer's two ports point down, for the device under test between them.
   const vna = definitions.find((d) => d.name === "Network analyzer")!;
   assert.deepEqual(vna.pins.map((p) => p.dir), [[0, -1], [0, -1]]);
+  // The four-port has four Pins along the bottom, 40px apart, on the grid.
+  const vna4 = definitions.find((d) => d.name === "Network analyzer (4-port)")!;
+  assert.deepEqual(vna4.pins.map((p) => [p.x, p.y]), [[20, 40], [60, 40], [100, 40], [140, 40]]);
   // The DUT is a through block: in on the left, out on the right.
   const dut = definitions.find((d) => d.name === "DUT")!;
   assert.deepEqual(dut.pins.map((p) => [p.x, p.y]), [[0, 0], [80, 0]]);

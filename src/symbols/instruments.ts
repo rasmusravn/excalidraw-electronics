@@ -39,23 +39,27 @@ export const spectrumAnalyzer = analyzer(
 // A sine: voltage against time.
 export const oscilloscope = analyzer("Oscilloscope", sine(26, -5, 28, 7), "SCOPE");
 
-// Port 1 and Port 2 out of the bottom at (20,40) and (60,40), for the device under test between
-// them. The screen shows a band-pass response; the label goes inside, under it.
+// Ports numbered from 1 out of the bottom at (20,40), (60,40), ...: one per 40px, for the device
+// under test between them. The screen shows a band-pass response; the label goes inside, under it.
 const response: Point[] = [[6, -8], [22, -8], [28, -28], [52, -28], [58, -8], [74, -8]];
-export const networkAnalyzer = instrument(
-  "Network analyzer",
-  [
-    rect(0, -40, 80, 60),
-    rect(6, -34, 68, 30),
-    line(...response),
-    text(40, -2, "VNA", "center"),
-    line([20, 20], [20, 40]),
-    line([60, 20], [60, 40]),
-    text(24, 22, "1"),
-    text(64, 22, "2"),
-  ],
-  [pin(20, 40, UP), pin(60, 40, UP)],
-);
+const vna = (name: string, ports: number): SymbolDefinition => {
+  const width = 40 * ports;
+  const shift = (width - 80) / 2;
+  const xs = Array.from({ length: ports }, (_, i) => 20 + 40 * i);
+  return instrument(
+    name,
+    [
+      rect(0, -40, width, 60),
+      rect(6, -34, width - 12, 30),
+      line(...response.map(([x, y]): Point => [x + shift, y])),
+      text(width / 2, -2, "VNA", "center"),
+      ...xs.flatMap((x, i) => [line([x, 20], [x, 40]), text(x + 4, 22, String(i + 1))]),
+    ],
+    xs.map((x) => pin(x, 40, UP)),
+  );
+};
+export const networkAnalyzer = vna("Network analyzer", 2);
+export const networkAnalyzer4 = vna("Network analyzer (4-port)", 4);
 
 // --- Sources ---
 
